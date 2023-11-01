@@ -35,21 +35,11 @@ _Capturas de pantalla_
 
 ## Instalación
 
-_Proporciona instrucciones sobre cómo instalar y ejecutar la aplicación en dispositivos Android._
+_instrucciones sobre cómo instalar y ejecutar la aplicación en dispositivos Android._
 
 ## Uso
 
-_Proporciona información sobre cómo utilizar la aplicación y cómo los usuarios pueden empezar a mejorar sus habilidades matemáticas._
-
-## Contribución
-
-_Las contribuciones son bienvenidas. Si deseas contribuir al desarrollo de MathRunner, sigue estos pasos:_
-
-1. [Fork](url_del_proyecto) el proyecto.
-2. Clona tu bifurcación localmente.
-3. Crea una rama con una descripción clara (por ejemplo, `mejora-de-la-interfaz-de-usuario`).
-4. Realiza tus cambios y pruebas.
-5. Confirma tus cambios y envía una [solicitud de extracción (pull request)](url_de_la_página_de_solicitudes_de_extracción) con una descripción detallada de tus modificaciones.
+_información sobre cómo utilizar la aplicación y cómo los usuarios pueden empezar a mejorar sus habilidades matemáticas._
 
 ## Contacto
 
