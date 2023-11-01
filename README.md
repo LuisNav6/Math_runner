@@ -1,6 +1,6 @@
 # MathRunner
 
-![Logo de MathRunner](https://photos.google.com/photo/AF1QipP91vNuCKPkCYcHBsqn67pWdRFp5GT6xf1SHIY)
+[![Logo-complete.png](https://i.postimg.cc/jq3HSLt0/Logo-complete.png)](https://postimg.cc/kD86jM2f)
 
 ## Descripción
 
