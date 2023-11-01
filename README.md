@@ -1,6 +1,10 @@
 # MathRunner
 
-[![Logo-complete.png](https://i.postimg.cc/jq3HSLt0/Logo-complete.png)](https://postimg.cc/kD86jM2f)
+<p align="center">
+  <a href="https://postimg.cc/kD86jM2f">
+    <img src="https://i.postimg.cc/jq3HSLt0/Logo-complete.png" alt="Logo de MathRunner">
+  </a>
+</p>
 
 ## Descripción
 
