@@ -3,4 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="Darker">#0A314A</color>
+    <color name="hintTextColor">#A0A0A0</color>
+    <color name="redExitColor">#E34747</color>
+    <color name="playColor">#69CF79</color>
 </resources>
