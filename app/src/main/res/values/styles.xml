@@ -17,4 +17,8 @@
         <item name="android:background">#F0F0F0</item>
         <item name="android:inputType">text</item>
     </style>
+    <style name="SeekBarStyle" parent="Widget.AppCompat.SeekBar">
+        <item name="android:thumb">@drawable/custom_thumb</item>
+        <item name="android:progressDrawable">@drawable/custom_progress</item>
+    </style>
 </resources>

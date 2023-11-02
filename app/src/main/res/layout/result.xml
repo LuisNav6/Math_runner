@@ -41,33 +41,45 @@
 
             <!-- Título "Records" -->
             <TextView
-                android:id="@+id/recordsTitle"
+                android:id="@+id/scoreTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Records"
+                android:text="Score:"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:layout_gravity="center_horizontal" />
+            <!-- Título "Records" -->
+            <TextView
+                android:id="@+id/timeTxt"
+                android:layout_marginTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time:"
                 android:textColor="#000000"
                 android:textSize="24sp"
                 android:layout_gravity="center_horizontal" />
 
-            <!-- ScrollView para la lista de jugadores y registros -->
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ListView
-                    android:id="@+id/recordsListView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </ScrollView>
             <android.widget.Button
-                android:id="@+id/backButton"
+                android:id="@+id/tryAgainButton"
                 android:textColor="@color/white"
                 style="@style/buttonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:background="@drawable/button_background"
-                android:text="Back"
+                android:text="Try Again"
                 app:layout_columnSpan="1"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal|center_vertical" />
+            <!-- Botón "Exit Up" -->
+            <android.widget.Button
+                android:id="@+id/ExitButton"
+                style="@style/buttonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:textColor="@color/white"
+                android:text="Exit"
+                app:layout_columnSpan="1"
+                android:background="@drawable/exit_style"
                 android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal|center_vertical" />
         </GridLayout>
