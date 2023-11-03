@@ -32,11 +32,10 @@
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2"
+            android:columnCount="1"
             android:rowCount="5"
             android:background="#DDEEF9"
             android:padding="16dp"
-
             android:layout_gravity="center_horizontal">
 
             <!-- Título "Settings" -->
@@ -50,21 +49,21 @@
                 android:textSize="24sp"
                 android:layout_gravity="center_horizontal" />
 
+            <!-- GridLayout para elementos "Volumen" -->
             <GridLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
                 android:rowCount="1"
-                android:layout_gravity="center_horizontal|center_vertical">
+                android:layout_gravity="center_horizontal">
 
                 <!-- TextView para indicar el volumen -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Volumen"
+                    android:text="Volume"
                     android:textColor="#000000"
                     android:textSize="18sp"
-                    android:layout_marginRight="20dp"
                     android:layout_gravity="center_vertical" />
 
                 <!-- SeekBar para ajustar el volumen -->
@@ -77,13 +76,32 @@
                     android:layout_gravity="center_vertical" />
             </GridLayout>
 
-            <!-- Selector de nivel de dificultad -->
-            <Spinner
-                android:id="@+id/difficultySpinner"
-                style="@style/buttonStyle"
+            <!-- GridLayout para elementos "Volumen" -->
+            <GridLayout
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_gravity="center_horizontal|center_vertical" />
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="1"
+                android:layout_gravity="center_horizontal">
+
+                <!-- TextView para indicar el volumen -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Difficulty Level"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:layout_gravity="center_vertical" />
+
+                <!-- SeekBar para ajustar el volumen -->
+                <SeekBar
+                    android:id="@+id/difficultSeekBar"
+                    style="@style/SeekBarStyle"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:layout_gravity="center_vertical" />
+            </GridLayout>
 
             <!-- Botón para mutear/desmutear música -->
             <android.widget.Button
@@ -93,7 +111,7 @@
                 style="@style/buttonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:layout_gravity="center_horizontal|center_vertical" />
+                android:layout_gravity="center_horizontal" />
 
             <android.widget.Button
                 android:id="@+id/backButton"
@@ -103,9 +121,8 @@
                 android:layout_height="48dp"
                 android:background="@drawable/button_background"
                 android:text="Back"
-
                 android:layout_marginTop="20dp"
-                android:layout_gravity="center_horizontal|center_vertical" />
+                android:layout_gravity="center_horizontal" />
         </GridLayout>
     </GridLayout>
 </FrameLayout>
