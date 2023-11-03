@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/logo_lite"
             android:layout_gravity="center"
-            app:layout_columnSpan="1" />
+            android:layout_column="0" />
 
         <android.widget.Button
             android:id="@+id/loginButton"
@@ -37,7 +37,7 @@
             android:layout_height="48dp"
             android:background="@drawable/button_background"
             android:text="Login"
-            app:layout_columnSpan="1"
+            android:layout_column="0"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal|center_vertical" />
 
@@ -49,7 +49,7 @@
             android:layout_height="48dp"
             android:textColor="@color/white"
             android:text="Sign Up"
-            app:layout_columnSpan="1"
+            android:layout_column="0"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal|center_vertical" />
 
@@ -61,7 +61,7 @@
             android:layout_height="48dp"
             android:textColor="@color/white"
             android:text="Records"
-            app:layout_columnSpan="1"
+            android:layout_column="0"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal|center_vertical" />
 
@@ -73,8 +73,9 @@
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:text="Settings"
-            app:layout_columnSpan="1"
+            android:layout_column="0"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal|center_vertical" />
     </GridLayout>
 </FrameLayout>
+

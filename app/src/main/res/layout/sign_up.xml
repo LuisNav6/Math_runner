@@ -16,7 +16,7 @@
         android:layout_marginRight="25dp"
         android:layout_marginBottom="60dp"
         android:columnCount="1"
-        android:rowCount="4"
+        android:rowCount="1"
         android:alignmentMode="alignBounds"
         android:rowOrderPreserved="false">
 
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/logo_lite"
             android:layout_gravity="center"
-            app:layout_columnSpan="1" />
+            android:layout_column="0" />
 
         <EditText
             android:id="@+id/NewUsernameEditText"
@@ -38,7 +38,8 @@
             android:layout_marginTop="20dp"
             android:gravity="center"
             style="@style/editTextStyle"
-            android:layout_gravity="center_horizontal|center_vertical"/>
+            android:layout_column="0"
+            android:layout_gravity="center_horizontal|center_vertical" />
 
         <android.widget.Button
             android:id="@+id/signUpButton"
@@ -48,9 +49,21 @@
             android:layout_height="48dp"
             android:background="@drawable/button_background"
             android:text="Sign up"
-            app:layout_columnSpan="1"
+            android:layout_column="0"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal|center_vertical" />
 
+        <android.widget.Button
+            android:id="@+id/backButton"
+            android:text="Back"
+            android:textColor="@color/white"
+            style="@style/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/button_background"
+            android:layout_column="0"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal|center_vertical" />
     </GridLayout>
 </FrameLayout>
+
