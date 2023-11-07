@@ -47,7 +47,7 @@ _información sobre cómo utilizar la aplicación y cómo los usuarios pueden em
 
 ## Contacto
 
-- Correo Electrónico: [pp.tony777@gmail.com](mailto:pp.tony777@gmail.com)
+- Correo Electrónico: [jimenez.romo.jose.antonio@gmail.com](mailto:jimenez.romo.jose.antonio@gmail.com)
 
 **¡Diviértete mejorando tus habilidades matemáticas con MathRunner!**
 
