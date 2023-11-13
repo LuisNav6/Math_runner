@@ -20,6 +20,14 @@
         android:layout_alignParentBottom="true"
         android:background="#000000" />
 
+    <ImageView
+        android:id="@+id/cloudImageView"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:src="@drawable/cloud_1"
+        android:layout_marginLeft="0dp" />
+
     <!-- Cerebro corriendo -->
     <ImageView
         android:id="@+id/brainImageView"
@@ -30,5 +38,5 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="80dp"
         android:src="@drawable/brain_animation" />
-
+    <include layout="@layout/lives" />
 </RelativeLayout>
