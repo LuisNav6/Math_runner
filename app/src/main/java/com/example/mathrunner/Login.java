@@ -12,7 +12,15 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.login);
 
         Button backButton = findViewById(R.id.backButton);
+        Button loginButton = findViewById(R.id.loginButton);
 
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Login.this, Logged.class);
+                startActivity(intent);
+            }
+        });
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
