@@ -62,7 +62,9 @@ public class GameActivity extends AppCompatActivity {
                 currentCloudIndex = (currentCloudIndex % totalClouds) + 1;
 
                 // Incrementa la velocidad de la animación
-                currentDuration -= 100; // Puedes ajustar el valor según tus necesidades
+                if(currentDuration >= 1000){
+                    currentDuration -= 100;
+                }
 
                 // Programa el siguiente cambio después del tiempo de duración de la animación
                 handler.postDelayed(this, currentDuration);
