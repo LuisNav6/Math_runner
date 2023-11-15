@@ -29,6 +29,7 @@
         android:layout_marginLeft="0dp" />
 
     <!-- Cerebro corriendo -->
+
     <ImageView
         android:id="@+id/brainImageView"
         android:layout_width="100dp"
@@ -38,5 +39,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="80dp"
         android:src="@drawable/brain_animation" />
+
     <include layout="@layout/lives" />
 </RelativeLayout>
