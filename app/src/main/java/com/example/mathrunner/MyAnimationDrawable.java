@@ -2,16 +2,20 @@ package com.example.mathrunner;
 
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
 
 public class MyAnimationDrawable extends AnimationDrawable {
-
     private int[] frameDurations; // Array para almacenar las velocidades de cada fotograma
     private int currentFrame;
+    private Handler handler;
 
     public MyAnimationDrawable(int[] durations, Drawable[] frames) {
         super();
 
         frameDurations = durations;
+        handler = new Handler(); // Inicializa el Handler aquí
 
         for (int i = 0; i < frames.length; i++) {
             addFrame(frames[i], durations[i]);
@@ -30,9 +34,8 @@ public class MyAnimationDrawable extends AnimationDrawable {
         // Selecciona la duración del fotograma actual
         int currentDuration = frameDurations[currentFrame];
 
-        // Este método está deprecado, pero se usa para mantener la compatibilidad
-        // con versiones antiguas de Android. Puedes buscar una alternativa más moderna si es necesario.
-        scheduleSelf(this, System.currentTimeMillis() + currentDuration);
+        // Programa la próxima actualización
+        handler.postAtTime(this, SystemClock.uptimeMillis() + currentDuration);
     }
 
     // Método para obtener la velocidad de un fotograma específico
@@ -40,24 +43,37 @@ public class MyAnimationDrawable extends AnimationDrawable {
         return frameDurations[frameIndex];
     }
 
-    // Nuevo método para actualizar las velocidades de todos los fotogramas
-    public void updateFrameDurations(int[] speeds) {
-        if (speeds.length == getTotalFrames()) {
-            for (int i = 0; i < speeds.length; i++) {
-                frameDurations[i] = speeds[i];
-            }
-        }
+
+    // Variable para indicar si se ha solicitado detener la animación
+    private boolean stopRequested = false;
+
+    // Método para detener la animación
+    public void stopAnimation() {
+        stopRequested = true;
     }
 
-    // Método para obtener la cantidad total de fotogramas
-    public int getTotalFrames() {
-        return getNumberOfFrames();
+    // Método para reiniciar la animación
+    public void resetAnimation() {
+        stopRequested = false;
+        // Reinicia la animación desde el principio
+        currentFrame = 0;
+        selectDrawable(currentFrame);
+        // Programa la próxima actualización
+        handler.postAtTime(this, SystemClock.uptimeMillis() + frameDurations[currentFrame]);
     }
 
-    // Método para establecer la duración de un fotograma específico
-    public void setDuration(int index, int duration) {
-        if (index >= 0 && index < getNumberOfFrames()) {
-            frameDurations[index] = duration;
-        }
+    // Método para verificar si la animación ha sido detenida
+    private boolean isStopRequested() {
+        return stopRequested;
+    }
+
+    // Método para reiniciar la animación y establecer stopRequested en false
+    public void restartAnimation() {
+        stopRequested = false;
+        // Reinicia la animación desde el principio
+        currentFrame = 0;
+        selectDrawable(currentFrame);
+        // Programa la próxima actualización
+        handler.postAtTime(this, SystemClock.uptimeMillis() + frameDurations[currentFrame]);
     }
 }
