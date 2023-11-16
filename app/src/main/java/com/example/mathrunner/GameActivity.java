@@ -18,7 +18,7 @@ public class GameActivity extends AppCompatActivity {
     private int currentCloudIndex = 1;
     private final int totalClouds = 10;
     private final int cloudAnimationDuration = 5000; // 5 seconds
-    private int initialSpeed = 40; // Velocidad inicial
+    private int initialSpeed = 5; // Velocidad inicial
     private int reductionFactor = 10; // Factor de reducción
     private MyAnimationDrawable brainAnimation;
     private int[] frameDurations;
@@ -50,7 +50,7 @@ public class GameActivity extends AppCompatActivity {
                 // Repite después de 10 segundos
                 speedHandler.postDelayed(this, 10000);
             }
-        }, 1000);
+        }, 0);
 
         // Inicia el Handler para imprimir el log cada 2 segundos
         uiHandler.postDelayed(new Runnable() {
@@ -86,6 +86,7 @@ public class GameActivity extends AppCompatActivity {
         initialSpeed = Math.max(initialSpeed, 1);
         // Reiniciar la animación después de reducir la velocidad
         brainAnimation.restartAnimation();
+
     }
 
     private void printLog() {

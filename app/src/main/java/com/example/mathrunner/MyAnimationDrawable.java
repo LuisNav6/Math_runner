@@ -11,11 +11,15 @@ public class MyAnimationDrawable extends AnimationDrawable {
     private int currentFrame;
     private Handler handler;
 
+    private Handler speedHandler = new Handler();
+
+
     public MyAnimationDrawable(int[] durations, Drawable[] frames) {
         super();
 
         frameDurations = durations;
         handler = new Handler(); // Inicializa el Handler aquí
+        speedHandler = new Handler();
 
         for (int i = 0; i < frames.length; i++) {
             addFrame(frames[i], durations[i]);
@@ -31,11 +35,19 @@ public class MyAnimationDrawable extends AnimationDrawable {
         }
         selectDrawable(currentFrame);
 
-        // Selecciona la duración del fotograma actual
-        int currentDuration = frameDurations[currentFrame];
+        // Selecciona la duración del fotograma actual con el factor de velocidad aplicado
+        int currentDuration = (int) (frameDurations[currentFrame] + 50);
 
-        // Programa la próxima actualización
-        handler.postAtTime(this, SystemClock.uptimeMillis() + currentDuration);
+        // Imprime el valor de currentFrame en el registro de log
+        Log.d("MyAnimationDrawable", "Current Frame: " + currentDuration);
+
+        // Programa la próxima actualización con el nuevo tiempo de duración y velocidad
+        speedHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                handler.postAtTime(MyAnimationDrawable.this, SystemClock.uptimeMillis() + currentDuration);
+            }
+        }, currentDuration);
     }
 
     // Método para obtener la velocidad de un fotograma específico
