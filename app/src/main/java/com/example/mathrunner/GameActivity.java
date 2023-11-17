@@ -1,6 +1,5 @@
 package com.example.mathrunner;
 
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,16 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class GameActivity extends AppCompatActivity {
 
-    private ImageView brainImageView;
+    private Brain brain;
+    private Book book;
     private ImageView cloudImageView;
     private int currentCloudIndex = 1;
     private final int totalClouds = 10;
     private final int cloudAnimationDuration = 5000; // 5 seconds
-    private int initialSpeed = 5; // Velocidad inicial
-    private int reductionFactor = 10; // Factor de reducción
-    private MyAnimationDrawable brainAnimation;
-    private int[] frameDurations;
-    private Handler uiHandler;
+    private Handler uiHandler; // Agregada declaración de uiHandler
     private Handler speedHandler;
 
     @Override
@@ -30,73 +26,63 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
 
-        // Obtén las referencias de los ImageView
-        brainImageView = findViewById(R.id.brainImageView);
-        cloudImageView = findViewById(R.id.cloudImageView);
-        uiHandler = new Handler();
+        // Obtén la referencia del nuevo objeto Brain
+        brain = findViewById(R.id.brain);
+        book = findViewById(R.id.book);
 
-        brainAnimation = initializeBrainAnimation();
-        if (brainImageView != null) {
-            brainImageView.setImageDrawable(brainAnimation);
-        }
+        cloudImageView = findViewById(R.id.cloudImageView);
+        uiHandler = new Handler(); // Inicializada uiHandler
+
+        // Inicializa la animación del cerebro en la clase Brain
+        brain.initializeBrainAnimation();
 
         // Inicia la animación de desplazamiento de las nubes
         startCloudAnimation();
+        // Inicia la animación de desplazamiento del libro
+        startBookAnimation();
         speedHandler = new Handler();
         speedHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                reduceSpeed();
+                // Ajusta la velocidad utilizando el método de Brain
+                brain.reduceSpeed(); // Cambiado a reduceSpeed en Brain
                 // Repite después de 10 segundos
                 speedHandler.postDelayed(this, 10000);
             }
         }, 0);
 
-        // Inicia el Handler para imprimir el log cada 2 segundos
-        uiHandler.postDelayed(new Runnable() {
+    }
+
+
+    private void startBookAnimation() {
+        final Handler handler = new Handler();
+        handler.post(new Runnable() {
+            private int currentDuration = cloudAnimationDuration;
+
             @Override
             public void run() {
-                printLog();
-                uiHandler.postDelayed(this, 2000);
+                // Configura la posición inicial del libro
+                book.setX(900);
+                book.setY(1400);
+                // Agrega la lógica para la animación del libro
+                Animation bookTranslationAnimation = AnimationUtils.loadAnimation(GameActivity.this, R.anim.cloud_translation);
+                bookTranslationAnimation.setDuration(currentDuration);
+                book.startAnimation(bookTranslationAnimation);
+                boolean test = brain.isCollidingWithBook(book);
+                Log.d("Collision", String.valueOf(test));
+                // Verifica la colisión con el cerebro
+                if (brain.isCollidingWithBook(book)) {
+                    Log.d("Collision", "Brain collided with Book!");
+                    // Realiza acciones cuando hay colisión
+                    // Por ejemplo, resta una vida al cerebro
+                    Log.d("Collision", "Brain collided with Book!");
+                }else{
+                    Log.d("Collision", "Brain not collided with Book!");
+                }
+
+                handler.postDelayed(this, currentDuration);
             }
-        }, 2000);
-    }
-
-    private MyAnimationDrawable initializeBrainAnimation() {
-        int totalFrames = 45;
-        frameDurations = new int[totalFrames];
-
-        Drawable[] frames = new Drawable[totalFrames];
-
-        for (int i = 0; i < totalFrames; i++) {
-            frameDurations[i] = Math.max(frameDurations[i], 1);
-
-            int drawableResourceId = getResources().getIdentifier("brain_frame_" + (i + 1), "drawable", getPackageName());
-            frames[i] = getResources().getDrawable(drawableResourceId);
-
-            Log.d("AnimationDuration", "Frame " + i + " calculated duration: " + frameDurations[i] +
-                    ", actual duration: " + (brainAnimation != null ? brainAnimation.getFrameSpeed(i) : "N/A") + "\n");
-        }
-
-        return new MyAnimationDrawable(frameDurations, frames);
-    }
-
-    private void reduceSpeed() {
-        initialSpeed -= reductionFactor;
-        initialSpeed = Math.max(initialSpeed, 1);
-        // Reiniciar la animación después de reducir la velocidad
-        brainAnimation.restartAnimation();
-
-    }
-
-    private void printLog() {
-        StringBuilder logMessage = new StringBuilder("Current initialSpeed: " + initialSpeed);
-
-        for (int i = 0; i < 45; i++) {
-            logMessage.append(", Frame ").append(i).append(" actual duration: ").append(brainAnimation.getFrameSpeed(i)).append("\n");
-        }
-
-        Log.d("AnimationDuration", logMessage.toString());
+        });
     }
 
     private void startCloudAnimation() {
