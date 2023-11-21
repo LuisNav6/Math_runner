@@ -28,6 +28,7 @@
         <activity android:name=".Records"></activity>
         <activity android:name=".Settings"></activity>
         <activity android:name=".Logged"></activity>
+        <activity android:name=".examActivity"></activity>
     </application>
 
 </manifest>

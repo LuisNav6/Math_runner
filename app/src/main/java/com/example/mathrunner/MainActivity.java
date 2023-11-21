@@ -23,8 +23,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }, 5000);
-        ProgressBar progressBar = findViewById(R.id.loadingProgressBar);
-        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.Darker), PorterDuff.Mode.SRC_IN);
+
 
     }
 }
