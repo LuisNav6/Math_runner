@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ public class GameActivity extends AppCompatActivity {
     private int currentCloudIndex = 1;
     private final int totalClouds = 10;
     private final int cloudAnimationDuration = 5000; // 5 seconds
+    private final int bookAnimationDuration = 5000;
     private Handler uiHandler; // Agregada declaración de uiHandler
     private Handler speedHandler;
 
@@ -57,7 +59,7 @@ public class GameActivity extends AppCompatActivity {
     private void startBookAnimation() {
         final Handler handler = new Handler();
         handler.post(new Runnable() {
-            private int currentDuration = cloudAnimationDuration;
+            private int currentDuration = bookAnimationDuration;
 
             @Override
             public void run() {
@@ -66,8 +68,15 @@ public class GameActivity extends AppCompatActivity {
                 book.setY(1400);
                 // Agrega la lógica para la animación del libro
                 Animation bookTranslationAnimation = AnimationUtils.loadAnimation(GameActivity.this, R.anim.cloud_translation);
+                currentDuration = Math.max(currentDuration, 0);
                 bookTranslationAnimation.setDuration(currentDuration);
                 book.startAnimation(bookTranslationAnimation);
+                currentCloudIndex = (currentCloudIndex % totalClouds) + 1;
+
+                if (currentDuration >= 500) {
+                    currentDuration -= 100;
+                }
+
                 boolean test = brain.isCollidingWithBook(book);
                 Log.d("Collision", String.valueOf(test));
                 // Verifica la colisión con el cerebro
@@ -75,7 +84,6 @@ public class GameActivity extends AppCompatActivity {
                     Log.d("Collision", "Brain collided with Book!");
                     // Realiza acciones cuando hay colisión
                     // Por ejemplo, resta una vida al cerebro
-                    Log.d("Collision", "Brain collided with Book!");
                 }else{
                     Log.d("Collision", "Brain not collided with Book!");
                 }
@@ -83,6 +91,26 @@ public class GameActivity extends AppCompatActivity {
                 handler.postDelayed(this, currentDuration);
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_SPACE) {
+            // Tecla de espacio presionada, realiza el salto
+            brain.jump();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_SPACE) {
+            // Tecla de espacio liberada, detén el salto
+            brain.stopJumpAnimation();
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
     private void startCloudAnimation() {

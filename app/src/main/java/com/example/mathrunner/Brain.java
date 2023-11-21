@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+
 import androidx.appcompat.widget.AppCompatImageView;
 
 public class Brain extends AppCompatImageView {
 
     private MyAnimationDrawable brainAnimation;
-
     private int x, y; // Posición del cerebro en la pantalla
     private int velocityY; // Velocidad vertical del cerebro
     private boolean isJumping; // Indica si el cerebro está saltando
@@ -81,15 +83,54 @@ public class Brain extends AppCompatImageView {
             y = Constants.GROUND_LEVEL;
             velocityY = 0;
             isJumping = false;
+
         }
     }
 
+
     public void jump() {
-        if (!isJumping) {
-            velocityY = Constants.JUMP_VELOCITY;
-            isJumping = true;
+        velocityY = Constants.JUMP_VELOCITY;
+        isJumping = true;
+
+        // Inicia la animación de salto
+        startJumpAnimation();
+    }
+
+    public void stopJumpAnimation() {
+        if (isJumping) {
+            isJumping = false;
         }
     }
+
+    private void startJumpAnimation() {
+        // Cargar la animación de salto desde el recurso XML
+        Animation jumpAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.brain_jump);
+        Animation foward = AnimationUtils.loadAnimation(getContext(), R.anim.foward);
+        // Configurar la posición final después de la animación
+        jumpAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                // Puedes realizar acciones al inicio de la animación si es necesario
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                // Puedes realizar acciones en cada repetición de la animación si es necesario
+            }
+        });
+
+        // Iniciar la animación solo si no está saltando actualmente
+        if (isJumping) {
+            startAnimation(jumpAnimation);
+        }
+    }
+
+
 
     public void crouch() {
         // Agrega lógica para manejar el agacharse

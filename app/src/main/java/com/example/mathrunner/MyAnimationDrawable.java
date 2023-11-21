@@ -38,9 +38,6 @@ public class MyAnimationDrawable extends AnimationDrawable {
         // Selecciona la duración del fotograma actual con el factor de velocidad aplicado
         int currentDuration = (int) (frameDurations[currentFrame] + 50);
 
-        // Imprime el valor de currentFrame en el registro de log
-        Log.d("MyAnimationDrawable", "Current Frame: " + currentDuration);
-
         // Programa la próxima actualización con el nuevo tiempo de duración y velocidad
         speedHandler.postDelayed(new Runnable() {
             @Override
