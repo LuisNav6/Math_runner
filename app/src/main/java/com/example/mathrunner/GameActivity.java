@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -63,9 +65,6 @@ public class GameActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                // Configura la posición inicial del libro
-                book.setX(900);
-                book.setY(1400);
                 // Agrega la lógica para la animación del libro
                 Animation bookTranslationAnimation = AnimationUtils.loadAnimation(GameActivity.this, R.anim.cloud_translation);
                 currentDuration = Math.max(currentDuration, 0);
@@ -91,6 +90,23 @@ public class GameActivity extends AppCompatActivity {
                 handler.postDelayed(this, currentDuration);
             }
         });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                // Finger touched down
+                // Start brain jump
+                brain.jump();
+                break;
+            case MotionEvent.ACTION_UP:
+                // Finger lifted up
+                // Stop jump animation
+                brain.stopJumpAnimation();
+                break;
+        }
+        return super.onTouchEvent(event);
     }
 
     @Override
