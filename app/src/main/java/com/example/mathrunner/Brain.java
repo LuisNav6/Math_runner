@@ -5,10 +5,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Transformation;
-import android.view.animation.TranslateAnimation;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -18,6 +17,8 @@ public class Brain extends AppCompatImageView {
     private int x, y; // Posición del cerebro en la pantalla
     private int velocityY; // Velocidad vertical del cerebro
     private boolean isJumping; // Indica si el cerebro está saltando
+    private Book book; // Agrega una referencia al objeto Book
+    private int jumpStartY; // Nueva variable global
 
     private Rect brainRect = new Rect();
     private Rect bookRect = new Rect();
@@ -47,6 +48,10 @@ public class Brain extends AppCompatImageView {
         initializeBrainAnimation(); // Inicializar la animación del cerebro (brain)
     }
 
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
     public void initializeBrainAnimation() {
         int totalFrames = 45;
         int[] frameDurations = new int[totalFrames];
@@ -66,15 +71,30 @@ public class Brain extends AppCompatImageView {
     }
 
     public boolean isCollidingWithBook(Book book) {
-        // Obtén los límites (Rect) de las vistas
-        this.getHitRect(brainRect);
-        book.getHitRect(bookRect);
+        // Asegúrate de que el objeto Book no sea nulo
+        if (book != null) {
+            // Obtén los límites (Rect) de las vistas
+            this.getHitRect(brainRect);
+            book.getHitRect(bookRect);
 
-        // Imprime la altura y el ancho de los Rectángulos
-        Log.d("Rectangles", "Brain Rect: Coords=" + brainRect);
-        Log.d("Rectangles", "Book Rect: Coords=" + bookRect);
-        // Verifica si los Rects se superponen
-        return Rect.intersects(brainRect, bookRect);
+            // Imprime la altura y el ancho de los Rectángulos
+            Log.d("Rectangles", "Brain Rect: Coords=" + brainRect);
+            Log.d("Rectangles", "Book Rect: Coords=" + bookRect);
+
+            if(isJumping){
+                brainRect.top = getBrainY();
+                this.getHitRect(brainRect);
+                Log.d("Rectangles", "Brain Rect JUMP: Coords=" + brainRect);
+                return Rect.intersects(brainRect,bookRect);
+            }
+
+            // Verifica si los Rects se superponen
+            return Rect.intersects(brainRect, bookRect);
+        } else {
+            // Si el objeto Book es nulo, asume que no hay colisión
+            Log.d("null","Nulo");
+            return false;
+        }
     }
 
     public void update() {
@@ -93,14 +113,15 @@ public class Brain extends AppCompatImageView {
         }
     }
 
-
     public void jump() {
         velocityY = Constants.JUMP_VELOCITY;
         isJumping = true;
+        jumpStartY = getBrainY(); // Almacena la posición Y al iniciar el salto
 
         // Inicia la animación de salto
         startJumpAnimation();
     }
+
 
     public void stopJumpAnimation() {
         if (isJumping) {
@@ -109,50 +130,47 @@ public class Brain extends AppCompatImageView {
     }
 
     private void startJumpAnimation() {
-        // Cargar la animación de salto desde el recurso XML
         Animation jumpAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.brain_jump);
 
-        // Configurar la posición final después de la animación
         jumpAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                // Puedes realizar acciones al inicio de la animación si es necesario
-                //updateBrainPositionDuringAnimation(animation);
+                updateBrainPositionDuringAnimation(animation);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                // Restablece la posición final después de la animación
                 y = Constants.GROUND_LEVEL;
                 isJumping = false;
+
+                // Luego de que la animación ha finalizado, verifica la colisión
+                checkCollisionWithBook();
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                // Puedes realizar acciones en cada repetición de la animación si es necesario
-                //updateBrainPositionDuringAnimation(animation);
+                updateBrainPositionDuringAnimation(animation);
             }
         });
 
-        // Iniciar la animación solo si no está saltando actualmente
         if (isJumping) {
-            // Agregar un listener para actualizar la posición durante la animación
             jumpAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-                    //updateBrainPositionDuringAnimation(animation);
+                    updateBrainPositionDuringAnimation(animation);
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    // Restablece la posición final después de la animación
                     y = Constants.GROUND_LEVEL;
                     isJumping = false;
+
+                    // Luego de que la animación ha finalizado, verifica la colisión
+                    checkCollisionWithBook();
                 }
 
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-                    // Puedes realizar acciones en cada repetición de la animación si es necesario
                     updateBrainPositionDuringAnimation(animation);
                 }
             });
@@ -161,33 +179,35 @@ public class Brain extends AppCompatImageView {
         }
     }
 
-    // Método para actualizar la posición del cerebro durante la animación
-    private void updateBrainPositionDuringAnimation(Animation animation) {
-        if (animation instanceof TranslateAnimation) {
-            // Obtén la información de la animación de traslación
-            TranslateAnimation translateAnimation = (TranslateAnimation) animation;
+    private void updateBrainPositionDuringAnimation(final Animation animation) {
+        getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                // Remueve el listener para que no se llame continuamente
+                getViewTreeObserver().removeOnPreDrawListener(this);
 
-            // Obtiene la información de transformación de la animación
-            Transformation transformation = new Transformation();
-            animation.getTransformation(translateAnimation.getStartTime(), transformation);
+                // Establece la nueva posición del cerebro
+                brainRect.top = jumpStartY; // Utiliza la posición Y almacenada al iniciar el salto
+                brainRect.bottom = jumpStartY + getHeight(); // Ajusta la parte inferior en consecuencia
+                Log.d("Y", "setBrainY " + jumpStartY);
+                Log.d("Rectangles", "Brain Rect: Coords=" + brainRect);
 
-            // Obtén el tiempo transcurrido desde el inicio de la animación
-            long currentTime = System.currentTimeMillis();
-            long elapsedTime = currentTime - translateAnimation.getStartTime();
-
-            // Calcula la nueva posición Y utilizando la ecuación de movimiento uniformemente acelerado
-            float currentY = velocityY * elapsedTime / 1000 - 0.5f * Constants.GRAVITY * (elapsedTime / 1000) * (elapsedTime / 1000);
-
-            // Establece la nueva posición del cerebro
-            y = (int) currentY;
-            setBrainY(y);
-            brainRect.top = y;
-            Log.d("pain","BrainRect = " + brainRect.top);
-            Log.d("Y", "setBrainY " + y);
-        }
+                return true;
+            }
+        });
     }
 
 
+
+    private void checkCollisionWithBook() {
+        // Verifica la colisión después de que la animación ha finalizado
+        if (isCollidingWithBook(book)) {
+            Log.d("Collision", "Brain collided with Book!");
+            // Agrega aquí cualquier lógica adicional después de la colisión
+        } else {
+            Log.d("Collision", "Brain not collided with Book!");
+        }
+    }
 
     public void crouch() {
         // Agrega lógica para manejar el agacharse

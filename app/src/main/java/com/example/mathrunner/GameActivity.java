@@ -60,6 +60,21 @@ public class GameActivity extends AppCompatActivity {
             }
         }, 0);
 
+        uiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Actualizar la posición del cerebro
+                brain.update();
+
+                // Verificar la colisión con el libro
+                if (brain.isCollidingWithBook(book)) {
+                    handleCollision(); // Agrega aquí la lógica que desees al producirse la colisión
+                }
+
+                // Repite el bucle de juego después de un breve intervalo
+                uiHandler.postDelayed(this, 16); // Aproximadamente 60 FPS (1000 ms / 60 frames)
+            }
+        }, 0);
     }
 
 
@@ -87,18 +102,6 @@ public class GameActivity extends AppCompatActivity {
                 // Establece la nueva posición del libro
                 book.setX(newBookX);
 
-                // Verifica la colisión con el cerebro
-                boolean test = brain.isCollidingWithBook(book);
-                Log.d("Collision", String.valueOf(test));
-                if (brain.isCollidingWithBook(book)) {
-                    Log.d("Collision", "Brain collided with Book!");
-                    // Realiza acciones cuando hay colisión
-                    // Por ejemplo, resta una vida al cerebro
-                    lives--;
-                    life.setText(String.valueOf(lives));
-                } else {
-                    Log.d("Collision", "Brain not collided with Book!");
-                }
 
                 // Ajusta la velocidad del libro con el tiempo
                 float elapsedSeconds = (currentTime - startTime) / 500.0f;
@@ -122,6 +125,12 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
+    // Método para manejar la colisión
+    private void handleCollision() {
+        Log.d("Collision", "Brain collided with Book!");
+        lives--; // Reducir el número de vidas
+        life.setText(String.valueOf(lives)); // Actualizar el texto de las vidas
+    }
 
 
     @Override
