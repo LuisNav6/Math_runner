@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +25,8 @@ public class GameActivity extends AppCompatActivity {
     private final int bookAnimationDuration = 5000;
     private Handler uiHandler; // Agregada declaración de uiHandler
     private Handler speedHandler;
+    private int lives = 3;
+    private TextView life;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,8 @@ public class GameActivity extends AppCompatActivity {
         // Obtén la referencia del nuevo objeto Brain
         brain = findViewById(R.id.brain);
         book = findViewById(R.id.book);
+        life= findViewById(R.id.life);
+        life.setText(String.valueOf(lives));
 
         cloudImageView = findViewById(R.id.cloudImageView);
         uiHandler = new Handler(); // Inicializada uiHandler
@@ -61,36 +66,63 @@ public class GameActivity extends AppCompatActivity {
     private void startBookAnimation() {
         final Handler handler = new Handler();
         handler.post(new Runnable() {
-            private int currentDuration = bookAnimationDuration;
+            private long startTime = System.currentTimeMillis();
+            private long lastUpdateTime = startTime;
 
             @Override
             public void run() {
-                // Agrega la lógica para la animación del libro
-                Animation bookTranslationAnimation = AnimationUtils.loadAnimation(GameActivity.this, R.anim.cloud_translation);
-                currentDuration = Math.max(currentDuration, 0);
-                bookTranslationAnimation.setDuration(currentDuration);
-                book.startAnimation(bookTranslationAnimation);
-                currentCloudIndex = (currentCloudIndex % totalClouds) + 1;
+                long currentTime = System.currentTimeMillis();
+                long elapsedTime = currentTime - lastUpdateTime;
 
-                if (currentDuration >= 500) {
-                    currentDuration -= 100;
+                // Actualiza la posición del libro basándote en el tiempo transcurrido y la velocidad deseada
+                int displacement = (int) (elapsedTime * Constants.BOOK_SPEED / 500); // velocidad en píxeles por segundo
+                float newBookX = book.getX() - displacement;
+
+                // Verifica si el libro se ha movido completamente fuera de la pantalla
+                if (newBookX + book.getWidth() < 0) {
+                    // Reinicia la posición del libro en el lado derecho de la pantalla
+                    newBookX = getResources().getDisplayMetrics().widthPixels;
                 }
 
+                // Establece la nueva posición del libro
+                book.setX(newBookX);
+
+                // Verifica la colisión con el cerebro
                 boolean test = brain.isCollidingWithBook(book);
                 Log.d("Collision", String.valueOf(test));
-                // Verifica la colisión con el cerebro
                 if (brain.isCollidingWithBook(book)) {
                     Log.d("Collision", "Brain collided with Book!");
                     // Realiza acciones cuando hay colisión
                     // Por ejemplo, resta una vida al cerebro
-                }else{
+                    lives--;
+                    life.setText(String.valueOf(lives));
+                } else {
                     Log.d("Collision", "Brain not collided with Book!");
                 }
 
-                handler.postDelayed(this, currentDuration);
+                // Ajusta la velocidad del libro con el tiempo
+                float elapsedSeconds = (currentTime - startTime) / 500.0f;
+                float acceleration = 0.001f; // Puedes ajustar este valor según sea necesario
+                float newBookSpeed = Constants.BOOK_SPEED + acceleration * elapsedSeconds;
+
+                // Establece un límite máximo de velocidad para el libro
+                float maxBookSpeed = 900f; // Puedes ajustar este valor según sea necesario
+                if (newBookSpeed > maxBookSpeed) {
+                    newBookSpeed = maxBookSpeed;
+                }
+                Log.d("pain","Spped Book:" + newBookSpeed);
+                // Guarda la nueva velocidad del libro
+                Constants.BOOK_SPEED = newBookSpeed;
+
+                // Guarda el tiempo actual para la próxima actualización
+                lastUpdateTime = currentTime;
+
+                handler.postDelayed(this, 16); // Aproximadamente 60 FPS (1000 ms / 60 frames)
             }
         });
     }
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

@@ -1,11 +1,15 @@
 package com.example.mathrunner;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Transformation;
+import android.view.animation.TranslateAnimation;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -15,6 +19,10 @@ public class Brain extends AppCompatImageView {
     private int x, y; // Posición del cerebro en la pantalla
     private int velocityY; // Velocidad vertical del cerebro
     private boolean isJumping; // Indica si el cerebro está saltando
+    private ValueAnimator jumpAnimator;
+
+    private Rect brainRect = new Rect();
+    private Rect bookRect = new Rect();
 
     public Brain(Context context) {
         super(context);
@@ -60,16 +68,30 @@ public class Brain extends AppCompatImageView {
     }
 
     public boolean isCollidingWithBook(Book book) {
-        Rect brainRect = new Rect();
-        Rect bookRect = new Rect();
-
         // Obtén los límites (Rect) de las vistas
         this.getHitRect(brainRect);
         book.getHitRect(bookRect);
 
-        // Verifica si los Rects se superponen
-        return Rect.intersects(brainRect, bookRect);
+        // Si el cerebro está saltando, actualiza el top del brainRect
+        if (isJumping) {
+            // Calcular la nueva posición en Y durante el salto
+            Log.d("pain","Y ->" + y);
+            int newY = y + velocityY;
+
+            // Establecer el nuevo top y bottom del brainRect
+            brainRect.top = newY;
+            brainRect.bottom = newY + getHeight(); // Ajusta getHeight() según tu lógica
+            Log.d("pain","Brain Rect JUMP ->" + brainRect);
+            Log.d("pain","Book Rect JUMP ->" + bookRect);
+            return Rect.intersects(brainRect,bookRect);
+        }else{
+            Log.d("pain","Brain Rect ->" + brainRect);
+            Log.d("pain","Book Rect ->" + bookRect);
+            // Verifica si los Rects se superponen
+            return Rect.intersects(brainRect, bookRect);
+        }
     }
+
 
     public void update() {
         // Actualizar la posición del cerebro
@@ -83,53 +105,37 @@ public class Brain extends AppCompatImageView {
             y = Constants.GROUND_LEVEL;
             velocityY = 0;
             isJumping = false;
-
         }
     }
 
-
     public void jump() {
-        velocityY = Constants.JUMP_VELOCITY;
-        isJumping = true;
+        if (!isJumping) {
+            isJumping = true;
 
-        // Inicia la animación de salto
-        startJumpAnimation();
+            // Configura el ValueAnimator para animar la posición en Y del cerebro
+            jumpAnimator = ValueAnimator.ofInt(y, y - Constants.JUMP_HEIGHT);
+            jumpAnimator.setDuration(Constants.JUMP_DURATION);
+            jumpAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    // Actualiza la posición en Y del cerebro durante la animación
+                    int animatedValue = (int) animation.getAnimatedValue();
+                    setBrainY(animatedValue);
+                    invalidate(); // Invalida la vista para forzar el redibujo durante la animación
+                }
+            });
+
+            jumpAnimator.start();
+        }
     }
 
     public void stopJumpAnimation() {
-        if (isJumping) {
+        if (isJumping && jumpAnimator != null) {
+            jumpAnimator.cancel();
             isJumping = false;
+            jumpAnimator = null;
         }
     }
-
-    private void startJumpAnimation() {
-        // Cargar la animación de salto desde el recurso XML
-        Animation jumpAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.brain_jump);
-        Animation foward = AnimationUtils.loadAnimation(getContext(), R.anim.foward);
-        // Configurar la posición final después de la animación
-        jumpAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                // Puedes realizar acciones al inicio de la animación si es necesario
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-                // Puedes realizar acciones en cada repetición de la animación si es necesario
-            }
-        });
-
-        // Iniciar la animación solo si no está saltando actualmente
-        if (isJumping) {
-            startAnimation(jumpAnimation);
-        }
-    }
-
 
 
     public void crouch() {
@@ -139,9 +145,6 @@ public class Brain extends AppCompatImageView {
 
         // Restablecer la posición en Y para simular el agacharse
         y = Constants.GROUND_LEVEL;
-
-        // Cambiar la animación o realizar otras acciones necesarias
-        // brainAnimation.setCrouchAnimation(); // Esto es un ejemplo, necesitas definirlo según tus clases y lógica
     }
 
     // Getter para la posición en X
