@@ -10,6 +10,9 @@ public class MyAnimationDrawable extends AnimationDrawable {
     private int[] frameDurations; // Array para almacenar las velocidades de cada fotograma
     private int currentFrame;
     private Handler handler;
+    private int currentDuration;
+
+    private int newSpeed = 0;
 
     private Handler speedHandler = new Handler();
 
@@ -26,6 +29,16 @@ public class MyAnimationDrawable extends AnimationDrawable {
         }
     }
 
+    // Método para actualizar dinámicamente las duraciones de los fotogramas
+    public void updateFrameDurations(int initialSpeed) {
+        newSpeed = initialSpeed - 10;
+        Log.d("Speed", "New speed: " + newSpeed);
+        // Aplicar la nueva velocidad a todas las duraciones de los fotogramas
+        for (int i = 0; i < frameDurations.length; i++) {
+            frameDurations[i] = newSpeed;
+        }
+    }
+
     @Override
     public void run() {
         int n = getNumberOfFrames();
@@ -35,8 +48,8 @@ public class MyAnimationDrawable extends AnimationDrawable {
         }
         selectDrawable(currentFrame);
 
-        // Selecciona la duración del fotograma actual con el factor de velocidad aplicado
-        int currentDuration = (int) (frameDurations[currentFrame] + 50);
+        // Selecciona la duración del fotograma
+        currentDuration =(frameDurations[currentFrame] -50);
 
         // Programa la próxima actualización con el nuevo tiempo de duración y velocidad
         speedHandler.postDelayed(new Runnable() {

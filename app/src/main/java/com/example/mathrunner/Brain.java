@@ -81,6 +81,7 @@ public class Brain extends AppCompatImageView {
         Drawable[] frames = new Drawable[totalFrames];
 
         for (int i = 0; i < totalFrames; i++) {
+            // Ajusta la duración de cada fotograma según sea necesario
             frameDurations[i] = Math.max(frameDurations[i], 1);
             int drawableResourceId = getResources().getIdentifier("brain_frame_" + (i + 1), "drawable", getContext().getPackageName());
             frames[i] = getResources().getDrawable(drawableResourceId);
@@ -92,6 +93,7 @@ public class Brain extends AppCompatImageView {
         // Iniciar la animación
         startAnimation();
     }
+
 
     public boolean isCollidingWithBook(Book book) {
         if (book != null) {
@@ -190,9 +192,9 @@ public class Brain extends AppCompatImageView {
             public void run() {
                 updateBrainPositionDuringAnimation();
                 elapsedTimeSinceJumpStart += 16; // Assume that it's called every 16 ms
-    
+
                 checkAndResetJumpPosition();
-    
+
                 // Repeat the update loop after a short interval
                 updateHandler.postDelayed(this, 16); // Approximately 60 FPS (1000 ms / 60 frames)
             }
@@ -285,6 +287,7 @@ public class Brain extends AppCompatImageView {
     public int getBrainY() {
         return y;
     }
+
 
     public void reduceSpeed() {
         brainAnimation.restartAnimation();
