@@ -36,11 +36,19 @@ public class Book extends AppCompatImageView {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        // Update the bookRect with the new bounds
+        // Actualiza bookRect con los nuevos límites
         bookRect.set(left, top, right, bottom);
     }
 
     public Rect getBookRect() {
         return bookRect;
+    }
+
+    public int getBookX() {
+        return bookRect.left;
+    }
+
+    public int getBookY() {
+        return bookRect.top;
     }
 }

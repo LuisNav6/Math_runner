@@ -27,7 +27,7 @@ public class GameActivity extends AppCompatActivity {
     private Handler speedHandler;
     private int lives = 3;
     private TextView life;
-
+    private boolean isGameActive = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +54,13 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void run() {
                 // Ajusta la velocidad utilizando el método de Brain
-                brain.reduceSpeed(); // Cambiado a reduceSpeed en Brain
+                brain.reduceSpeed();
+
                 // Repite después de 10 segundos
                 speedHandler.postDelayed(this, 10000);
             }
         }, 0);
+
 
         uiHandler.postDelayed(new Runnable() {
             @Override
@@ -66,13 +68,15 @@ public class GameActivity extends AppCompatActivity {
                 // Actualizar la posición del cerebro
                 brain.update();
 
-                // Verificar la colisión con el libro
-                if (brain.isCollidingWithBook(book)) {
-                    handleCollision(); // Agrega aquí la lógica que desees al producirse la colisión
+                // Verificar la colisión solo si el juego está en un estado activo
+                if (isGameActive) {
+                    if (brain.isCollidingWithBook(book)) {
+                        handleCollision();
+                    }
                 }
 
                 // Repite el bucle de juego después de un breve intervalo
-                uiHandler.postDelayed(this, 16); // Aproximadamente 60 FPS (1000 ms / 60 frames)
+                uiHandler.postDelayed(this, 16);
             }
         }, 0);
     }
@@ -128,9 +132,28 @@ public class GameActivity extends AppCompatActivity {
     // Método para manejar la colisión
     private void handleCollision() {
         Log.d("Collision", "Brain collided with Book!");
-        lives--; // Reducir el número de vidas
-        life.setText(String.valueOf(lives)); // Actualizar el texto de las vidas
+        Log.d("Lives", String.valueOf(lives));
+
+        if (lives > 0) {
+            lives--;
+            life.setText(String.valueOf(lives));
+
+            if (lives <= 0) {
+                isGameActive = false; // Desactivar el juego cuando no hay vidas restantes
+                exitGame();
+            }
+        }
     }
+
+    // Método para salir del juego
+    private void exitGame() {
+        // Puedes agregar aquí cualquier lógica adicional antes de salir del juego
+        // Por ejemplo, mostrar un mensaje de juego terminado, guardar puntuación, etc.
+
+        // Finaliza la actividad (sale del juego)
+        finish();
+    }
+
 
 
     @Override
