@@ -4,11 +4,17 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
 public class Book extends AppCompatImageView {
     private Rect bookRect = new Rect();
+    private int width;
+    private int x;
+    private int height;
+    private int y;
+
 
     public Book(Context context) {
         super(context);
@@ -44,11 +50,29 @@ public class Book extends AppCompatImageView {
         return bookRect;
     }
 
-    public int getBookX() {
-        return bookRect.left;
+    public void updateBookRect() {
+
+        bookRect.set(x, y, x + width, y + height);
+        Log.d("BookRect", "Updated BookRect coordinates: " + bookRect.toString());
     }
 
-    public int getBookY() {
-        return bookRect.top;
+    public void setX(int x) {
+        this.x = x;
+        updateBookRect();
+    }
+
+    public void setY(int y) {
+        this.y = y;
+        updateBookRect();
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+        updateBookRect();
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+        updateBookRect();
     }
 }

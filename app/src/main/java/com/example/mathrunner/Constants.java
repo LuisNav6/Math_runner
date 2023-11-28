@@ -2,8 +2,8 @@ package com.example.mathrunner;
 
 public class Constants {
     // Constantes relacionadas con el juego
-    public static final int GRAVITY = 2; // Ajusta según sea necesario
-    public static final int JUMP_VELOCITY = -30; // Ajusta según sea necesario
+    public static final float GRAVITY = 0.5f; // Ajusta según sea necesario
+    public static final float JUMP_VELOCITY = 1000; // Ajusta según sea necesario
     public static final int GROUND_LEVEL = 500; // Ajusta según sea necesario
     public static float BOOK_SPEED = 100;
     public static final int JUMP_HEIGHT = 1000;

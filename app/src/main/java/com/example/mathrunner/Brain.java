@@ -3,9 +3,9 @@ package com.example.mathrunner;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
@@ -15,14 +15,19 @@ public class Brain extends AppCompatImageView {
 
     private MyAnimationDrawable brainAnimation;
     private int x, y; // Posición del cerebro en la pantalla
-    private int velocityY; // Velocidad vertical del cerebro
+    private float velocityY; // Velocidad vertical del cerebro
     private boolean isJumping; // Indica si el cerebro está saltando
     private Book book; // Agrega una referencia al objeto Book
     private int jumpStartY; // Nueva variable global
-
+    private int originalY;
+    private int jumpHeight = 100;
+    private long jumpAnimationStartTime;
     private Rect brainRect = new Rect();
     private Rect bookRect = new Rect();
-    private boolean hasCollided = false;
+    private long elapsedTimeSinceJumpStart = 0;
+    private Handler updateHandler;
+    private boolean isColliding = false;
+
     public Brain(Context context) {
         super(context);
         init();
@@ -41,11 +46,29 @@ public class Brain extends AppCompatImageView {
     private void init() {
         // Inicializar otras propiedades del cerebro
         x = 0; // Establecer la posición inicial en la pantalla
-        y = 0;
+        y = Constants.GROUND_LEVEL;
         velocityY = 0;
         isJumping = false;
 
         initializeBrainAnimation(); // Inicializar la animación del cerebro (brain)
+        updateHandler = new Handler();
+        startUpdateLoop();
+    }
+
+
+    private void checkAndResetJumpPosition() {
+        if (elapsedTimeSinceJumpStart >= 2200) { // 2200 ms = 2.2 segundos
+            // Restablecer la posición a GROUND_LEVEL
+            setBrainY(Constants.GROUND_LEVEL);
+            elapsedTimeSinceJumpStart = 0; // Reiniciar el tiempo transcurrido
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        // Detener el bucle de actualización
+        updateHandler.removeCallbacksAndMessages(null);
     }
 
     public void setBook(Book book) {
@@ -72,81 +95,75 @@ public class Brain extends AppCompatImageView {
 
     public boolean isCollidingWithBook(Book book) {
         if (book != null) {
-            // Ajusta la posición del cerebro
-            brainRect.top = y;
-            brainRect.bottom = y + getHeight();
+            // Update the bookRect
+            bookRect.set((int)book.getX(), (int)book.getY(), (int)(book.getX() + book.getWidth()), (int)(book.getY() + book.getHeight()));
 
-            // Actualiza el rectángulo del cerebro durante el salto
-            if (isJumping) {
-                brainRect.top = jumpStartY;
-                brainRect.bottom = jumpStartY + getHeight();
-            }
-
-            this.getHitRect(brainRect);
-            book.getHitRect(bookRect);
-
-            // Log de las posiciones de los rectángulos para debug
-            Log.d("info brain", "Brain Rect: " + brainRect.toString());
-            Log.d("info book", "Book Rect: " + bookRect.toString());
-
-            boolean collisionDetected = Rect.intersects(brainRect, bookRect);
-
-            if (collisionDetected) {
-                Log.d("Collision", "Collision detected!");
-                return true;
+            // Check if the brainRect and bookRect are intersecting
+            if (Rect.intersects(brainRect, bookRect)) {
+                Log.d("Collision", "Brain collided with Book!");
+                    return true;
             }
         }
 
         return false;
     }
 
-
-
-
-
-
     public void update() {
-        // Restablece hasCollided en cada actualización
-        hasCollided = false;
-        // Actualizar la posición del cerebro
-        y += velocityY;
-
-
-        // Simular la gravedad (ajustar según sea necesario)
-        velocityY += Constants.GRAVITY;
-
-        // Verificar si el cerebro ha alcanzado el suelo
-        if (y > Constants.GROUND_LEVEL) {
+        // Update the brainRect
+        updateBrainRect();
+    
+        
+        // Update the position of the brain only if it's not jumping
+        if (!isJumping) {
+            // Update the position of the brain without simulating gravity
             y = Constants.GROUND_LEVEL;
-            velocityY = 0;
-            isJumping = false;
-
+        } else {
+            // If it's jumping, update the position with gravity simulation
+            y += velocityY;
+            Log.d("BrainRect", "Updated BrainRect coordinates: " + brainRect.toString());
+            Log.d("BookRect", "Updated BoockRect coordinates: " + bookRect.toString());
+            velocityY += Constants.GRAVITY;
+    
+            // Check if the brain has reached the ground
+            if (y > Constants.GROUND_LEVEL) {
+                y = Constants.GROUND_LEVEL;
+                velocityY = 0;
+                Log.d("BrainRect", "Updated BrainRect coordinates: " + brainRect.toString());
+                Log.d("BookRect", "Updated BoockRect coordinates: " + bookRect.toString());
+                isJumping = false;
+            }
         }
     }
 
     public void jump() {
-        velocityY = Constants.JUMP_VELOCITY;
-        isJumping = true;
-        jumpStartY = getBrainY(); // Almacena la posición Y al iniciar el salto
-
-        // Inicia la animación de salto
-        startJumpAnimation();
-    }
+        if (!isJumping) {
+            velocityY = -Constants.JUMP_VELOCITY;
+            isJumping = true;
+            jumpStartY = getBrainY(); // Almacena la posición Y al iniciar el salto
 
 
-    public void stopJumpAnimation() {
-        if (isJumping) {
-            isJumping = false;
+            // Inicia la animación de salto
+            startJumpAnimation();
         }
     }
 
+    public void stopJumpAnimation() {
+        // Puedes agregar lógica adicional aquí si es necesario
+        // Por ejemplo, detener la animación de salto manualmente si es posible
+    }
+
     private void startJumpAnimation() {
+        isJumping = true;
+        elapsedTimeSinceJumpStart = 0;
+        originalY = getBrainY();
+        jumpAnimationStartTime = System.currentTimeMillis();
+
         Animation jumpAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.brain_jump);
 
         jumpAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                updateBrainPositionDuringAnimation(animation, Constants.GROUND_LEVEL);
+                // No es necesario iniciar nada aquí
             }
 
             @Override
@@ -154,119 +171,125 @@ public class Brain extends AppCompatImageView {
                 y = Constants.GROUND_LEVEL;
                 isJumping = false;
 
-                // Luego de que la animación ha finalizado, verifica la colisión
-                checkCollisionWithBook();
-
-                // Ajusta la posición Y después de la animación
-                brainRect.top = y;
-                brainRect.bottom = y + getHeight();
+                // No need to check collision with book here
+                stopJumpAnimation();
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                updateBrainPositionDuringAnimation(animation, Constants.GROUND_LEVEL);
-
-                // Durante la repetición de la animación, verifica la colisión
-                checkCollisionWithBook();
+                // No es necesario repetir nada aquí
             }
         });
 
+        startAnimation(jumpAnimation);
+    }
+
+    private void startUpdateLoop() {
+        updateHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateBrainPositionDuringAnimation();
+                elapsedTimeSinceJumpStart += 16; // Assume that it's called every 16 ms
+    
+                checkAndResetJumpPosition();
+    
+                // Repeat the update loop after a short interval
+                updateHandler.postDelayed(this, 16); // Approximately 60 FPS (1000 ms / 60 frames)
+            }
+        }, 0);
+    }
+    
+    private void updateBrainPositionDuringAnimation() {
         if (isJumping) {
-            startAnimation(jumpAnimation);
+            double time = elapsedTimeSinceJumpStart / 1000.0; // Convert ms to seconds
+            double newY = Constants.GROUND_LEVEL + Constants.JUMP_VELOCITY * time - 0.5 * Constants.GRAVITY * time * time;
+            setBrainY((int) newY);
+        } else {
+            // If the brain is not jumping, it should fall to the ground due to gravity
+            double time = elapsedTimeSinceJumpStart / 1000.0; // Convert ms to seconds
+            double newY = y + 0.5 * Constants.GRAVITY * time * time;
+            setBrainY((int) newY);
+        }
+    
+        updateBrainRect();
+    
+        if (isCollidingWithBook(book) && !isJumping) {
+            startJumpAnimation();
+        }
+        if (book != null) {
+            if (y + getHeight() < book.getY()) {
+                // The brain is above the book and should not collide with it
+
+                Log.d("BrainRect", "Updated BrainRect coordinates: " + brainRect.toString());
+                Log.d("BookRect", "Updated BoockRect coordinates: " + bookRect.toString());
+            } else if (x >= book.getX() && x <= book.getX() + book.getWidth()) {
+                // The brain is colliding with the book and should jump
+                if (!isJumping && !isColliding) {
+
+                    startJumpAnimation();
+
+                    isColliding = true;
+    
+                    // Start a timer to ignore further collisions for 500 milliseconds
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            isColliding = false;
+                        }
+                    }, 500);
+                }
+            }
         }
     }
 
-
-
-
-    private void updateBrainPositionDuringAnimation(final Animation animation, final int finalY) {
-        getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                // Remueve el listener para que no se llame continuamente
-                getViewTreeObserver().removeOnPreDrawListener(this);
-
-                // Establece la nueva posición del cerebro
-                brainRect.top = finalY; // Utiliza la posición Y final
-                brainRect.bottom = finalY + getHeight(); // Ajusta la parte inferior en consecuencia
-
-                // Asegúrate de que la posición Y no sea inferior al suelo
-                if (brainRect.bottom > Constants.GROUND_LEVEL) {
-                    brainRect.bottom = Constants.GROUND_LEVEL;
-                    brainRect.top = brainRect.bottom - getHeight();
-                }
-
-                return true;
-            }
-        });
+    private void updateBrainRect() {
+        brainRect.set(x, y, x + getWidth(), y + getHeight());
     }
 
 
+    private int getJumpAnimationOffset() {
+        long animationDurationMillis = getJumpAnimationDuration();
+        float progress = (float) (System.currentTimeMillis() - jumpAnimationStartTime) / animationDurationMillis;
+        float offset = (float) Math.sin(progress * Math.PI) * jumpHeight;
+        return Math.round(offset);
+    }
 
+    private long getJumpAnimationDuration() {
+        return 2200; // 2.2 segundos en milisegundos
+    }
 
     private void checkCollisionWithBook() {
-        // Verifica la colisión después de que la animación ha finalizado
         if (isCollidingWithBook(book)) {
-            if (!hasCollided) {
-                Log.d("check Collision", "Brain collided with Book!");
-                Log.d("check Collision", "Brain position (X, Y): (" + getBrainX() + ", " + getBrainY() + ")");
-                Log.d("check Collision", "Book position (X, Y): (" + book.getBookX() + ", " + book.getBookY() + ")");
-                Log.d("check Collision", "Brain Rect: " + brainRect.toString());
-                Log.d("check Collision", "Book Rect: " + bookRect.toString());
-                // Agrega aquí cualquier lógica adicional después de la colisión
-                hasCollided = true;
-            } else {
-                Log.d("check Collision", "Collision already detected!");
-            }
-        } else {
-            Log.d("check Collision", "Brain not collided with Book!");
+            // Agrega aquí cualquier lógica adicional después de la colisión
+            handleCollision();
         }
     }
 
-
-
-
-    public void crouch() {
-        // Agrega lógica para manejar el agacharse
-        // Puedes cambiar la posición, la animación, etc., según tus necesidades
-        // Por ejemplo, si tienes una animación específica para cuando se agacha, puedes cambiar la animación aquí
-
-        // Restablecer la posición en Y para simular el agacharse
-        y = Constants.GROUND_LEVEL;
-
-        // Cambiar la animación o realizar otras acciones necesarias
-        // brainAnimation.setCrouchAnimation(); // Esto es un ejemplo, necesitas definirlo según tus clases y lógica
+    private void handleCollision() {
+        // Agrega aquí la lógica que deseas al producirse la colisión
+        // Por ejemplo, reducir vidas, actualizar puntajes, etc.
     }
 
-    // Getter para la posición en X
-    public int getBrainX() {
-        return x;
-    }
-
-    // Setter para la posición en X
     public void setBrainX(int x) {
         this.x = x;
     }
 
-    // Getter para la posición en Y
-    public int getBrainY() {
-        return y;
+    public int getBrainX() {
+        return x;
     }
 
-    // Setter para la posición en Y
     public void setBrainY(int y) {
         this.y = y;
     }
 
-    // Método para reducir la velocidad
-    public void reduceSpeed() {
-        // Lógica para reducir la velocidad según tus necesidades
-        // Puedes ajustar la velocidad directamente o aplicar alguna lógica específica aquí
-        Constants.BOOK_SPEED *= 0.9; // Por ejemplo, reducir la velocidad en un 10%
+    public int getBrainY() {
+        return y;
     }
 
+    public void reduceSpeed() {
+        brainAnimation.restartAnimation();
+    }
 
-    // Método para iniciar la animación
     private void startAnimation() {
         brainAnimation.start();
     }
