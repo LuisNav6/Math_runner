@@ -17,6 +17,12 @@ public class MyAnimationDrawable extends AnimationDrawable {
     private Handler speedHandler = new Handler();
 
 
+    @Override
+    public void stop() {
+        super.stop();
+
+        // Add your additional behavior here
+    }
     public MyAnimationDrawable(int[] durations, Drawable[] frames) {
         super();
 

@@ -1,5 +1,6 @@
 package com.example.mathrunner;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,7 @@ public class GameActivity extends AppCompatActivity {
     private int lives = 3;
     private TextView life;
     private boolean isGameActive = true;
+    private  ImageView Imageviewlife;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,7 @@ public class GameActivity extends AppCompatActivity {
         book = findViewById(R.id.book);
         life= findViewById(R.id.life);
         life.setText(String.valueOf(lives));
+        Imageviewlife = findViewById(R.id.heart);
 
         cloudImageView = findViewById(R.id.cloudImageView);
         uiHandler = new Handler(); // Inicializada uiHandler
@@ -68,9 +71,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
+    private Handler bookAnimationHandler = new Handler();
+
     private void startBookAnimation() {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
+        bookAnimationHandler.post(new Runnable() {
             private long startTime = System.currentTimeMillis();
             private long lastUpdateTime = startTime;
 
@@ -109,23 +113,72 @@ public class GameActivity extends AppCompatActivity {
                 // Guarda el tiempo actual para la próxima actualización
                 lastUpdateTime = currentTime;
 
-                handler.postDelayed(this, 16); // Aproximadamente 60 FPS (1000 ms / 60 frames)
+                bookAnimationHandler.postDelayed(this, 16); // Aproximadamente 60 FPS (1000 ms / 60 frames)
             }
         });
     }
 
-    // Método para manejar la colisión
+    public void stopBookAnimation() {
+        bookAnimationHandler.removeCallbacksAndMessages(null);
+    }
+
+
+    private boolean isCollisionHandled = false;
+
     private void handleCollision() {
-        Log.d("Collision", "Brain collided with Book!");
-        lives--;
-        life.setText(String.valueOf(lives));
+        if (!isCollisionHandled) {
+            Log.d("Collision", "Brain collided with Book!");
+            lives--;
+            life.setText(String.valueOf(lives));
+
+            switch (lives) {
+                case 3:
+                    Imageviewlife.setImageResource(R.drawable.single_heart_complete);
+                    break;
+                case 2:
+                    Imageviewlife.setImageResource(R.drawable.single_heart_one);
+                    break;
+                case 1:
+                    Imageviewlife.setImageResource(R.drawable.single_heart_two);
+                    break;
+                default:
+                    Imageviewlife.setImageResource(R.drawable.single_heart_tree);
+                    break;
+            }
+            //uiHandler.removeCallbacksAndMessages(null); // Stop the game loop
+
+            // Stop all animations
+            brain.stopAnimation();
+            stopBookAnimation();
+            stopCloudAnimation();
+
+            // Create an Intent for the new Activity
+            Intent intent = new Intent(this, examActivity.class);
+            
+            // Start the new Activity
+            startActivity(intent);
+
+            isCollisionHandled = true;
+        }
+    }
+
+
+    private void restartGame() {
+        // Reset game state
+        isCollisionHandled = false;
+
+        // Start all animations
+        brain.initializeBrainAnimation();
+        startCloudAnimation();
+        startBookAnimation();
     }
 
     // Método para salir del juego
     private void exitGame() {
         // Puedes agregar aquí cualquier lógica adicional antes de salir del juego
         // Por ejemplo, mostrar un mensaje de juego terminado, guardar puntuación, etc.
-
+        lives = 3; // Reset lives
+        life.setText(String.valueOf(lives));
         // Finaliza la actividad (sale del juego)
         finish();
     }
@@ -169,9 +222,10 @@ public class GameActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
+    private Handler cloudAnimationHandler = new Handler();
+
     private void startCloudAnimation() {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
+        cloudAnimationHandler.post(new Runnable() {
             private int currentDuration = cloudAnimationDuration;
 
             @Override
@@ -187,9 +241,14 @@ public class GameActivity extends AppCompatActivity {
                     currentDuration -= 100;
                 }
 
-                handler.postDelayed(this, currentDuration);
+                cloudAnimationHandler.postDelayed(this, currentDuration);
             }
         });
+    }
+
+    public void stopCloudAnimation() {
+        cloudAnimationHandler.removeCallbacksAndMessages(null);
+        cloudImageView.clearAnimation();
     }
 
     private int getCloudResource(int index) {

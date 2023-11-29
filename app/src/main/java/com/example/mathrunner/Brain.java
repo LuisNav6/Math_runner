@@ -154,6 +154,10 @@ public class Brain extends AppCompatImageView {
         // Por ejemplo, detener la animación de salto manualmente si es posible
     }
 
+    public void stopAnimation() {
+        brainAnimation.stop();
+    }
+
     private void startJumpAnimation() {
         isJumping = true;
         elapsedTimeSinceJumpStart = 0;
