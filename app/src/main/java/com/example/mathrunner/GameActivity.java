@@ -33,6 +33,7 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
 
+        Constants.setGroundLevel(this);
         // Obtén la referencia del nuevo objeto Brain
         brain = findViewById(R.id.brain);
         book = findViewById(R.id.book);
