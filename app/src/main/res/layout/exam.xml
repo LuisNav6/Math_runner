@@ -16,7 +16,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="70sp"
         android:textColor="@color/white"
-        android:fontFamily="@font/race"/>
+        android:fontFamily="@font/web_regular"/>
 
     <GridLayout
         android:id="@+id/optionsGridLayout"

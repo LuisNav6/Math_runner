@@ -1,7 +1,9 @@
 package com.example.mathrunner;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -17,10 +19,14 @@ public class examActivity extends AppCompatActivity {
     private int correctAnswer;
     private int difficultyLevel;
     private Button button1, button2, button3;
+    private GameInterpreter gameActivity = new GameInterpreter();
+    private int lives = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exam);
+        Intent intent = getIntent();
+        lives = intent.getIntExtra("lives", 0);
 
         operationTextView = findViewById(R.id.operationTextView);
         button1 = findViewById(R.id.button1);
@@ -158,13 +164,30 @@ public class examActivity extends AppCompatActivity {
 
     private void checkAnswer(int selectedAnswer) {
         if (selectedAnswer == correctAnswer) {
-            // Correct answer logic
+            if (lives > 0) {
+                // If there are remaining lives, restart the game
+                Intent game = new Intent(this, GameActivity.class);
+                game.putExtra("lives"   , lives);
+                startActivity(game);
+                finish();
+            } else {
+                // If no lives remaining, go to the end screen or perform any other logic
+                // You may want to create an EndActivity or handle game over here
+                // Example:
+                Intent endIntent = new Intent(this, Logged.class);
+                startActivity(endIntent);
+                finish();
+            }
         } else {
-            // Incorrect answer logic
+            --lives;
+            // If the answer is incorrect, restart the game
+            Intent game = new Intent(this, GameActivity.class);
+            game.putExtra("lives", lives);
+            startActivity(game);
+            finish();
         }
 
         // Generate a new random operation and update options
         generateRandomOperation();
-
     }
 }

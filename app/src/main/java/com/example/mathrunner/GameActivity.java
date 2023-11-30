@@ -30,11 +30,15 @@ public class GameActivity extends AppCompatActivity {
     private TextView life;
     private boolean isGameActive = true;
     private  ImageView Imageviewlife;
+    private boolean isGameStopped = false;
+    private GameInterpreter examResult = new GameInterpreter();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
-
+        Intent intent = getIntent();
+        lives = intent.getIntExtra("lives", 3);
+        Log.d("Lives", "onCreate: lives: " + lives);
         Constants.setGroundLevel(this);
         // Obtén la referencia del nuevo objeto Brain
         brain = findViewById(R.id.brain);
@@ -54,18 +58,37 @@ public class GameActivity extends AppCompatActivity {
         // Inicia la animación de desplazamiento del libro
         startBookAnimation();
 
+        switch (lives) {
+            case 3:
+                Imageviewlife.setImageResource(R.drawable.single_heart_complete);
+                break;
+            case 2:
+                Imageviewlife.setImageResource(R.drawable.single_heart_one);
+                break;
+            case 1:
+                Imageviewlife.setImageResource(R.drawable.single_heart_two);
+                break;
+            default:
+                Imageviewlife.setImageResource(R.drawable.single_heart_tree);
+                break;
+        }
+
         uiHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // Actualizar la posición del cerebro
-                brain.update();
-                if (brain.isCollidingWithBook(book)) {
-                    handleCollision();
+                if (!isGameStopped) {
+                    // Actualizar la posición del cerebro
+                    brain.update();
+                    if (brain.isCollidingWithBook(book)) {
+                        handleCollision();
+                        isGameStopped = true;
+                    }
+        
+                    // Repite el bucle de juego después de un breve intervalo
+                    if (!isGameStopped) {
+                        uiHandler.postDelayed(this, 16);
+                    }
                 }
-
-
-                // Repite el bucle de juego después de un breve intervalo
-                uiHandler.postDelayed(this, 16);
             }
         }, 0);
     }
@@ -128,45 +151,26 @@ public class GameActivity extends AppCompatActivity {
     private void handleCollision() {
         if (!isCollisionHandled) {
             Log.d("Collision", "Brain collided with Book!");
-            lives--;
-            life.setText(String.valueOf(lives));
-
-            switch (lives) {
-                case 3:
-                    Imageviewlife.setImageResource(R.drawable.single_heart_complete);
-                    break;
-                case 2:
-                    Imageviewlife.setImageResource(R.drawable.single_heart_one);
-                    break;
-                case 1:
-                    Imageviewlife.setImageResource(R.drawable.single_heart_two);
-                    break;
-                default:
-                    Imageviewlife.setImageResource(R.drawable.single_heart_tree);
-                    break;
-            }
-            //uiHandler.removeCallbacksAndMessages(null); // Stop the game loop
-
             // Stop all animations
             brain.stopAnimation();
             stopBookAnimation();
             stopCloudAnimation();
 
-            // Create an Intent for the new Activity
+            isCollisionHandled = true;
+            isGameStopped = true;
             Intent intent = new Intent(this, examActivity.class);
-            
+            intent.putExtra("lives", lives);
             // Start the new Activity
             startActivity(intent);
-
-            isCollisionHandled = true;
+            // Finish GameActivity
+            finish();
         }
     }
 
 
-    private void restartGame() {
+    public void restartGame() {
         // Reset game state
         isCollisionHandled = false;
-
         // Start all animations
         brain.initializeBrainAnimation();
         startCloudAnimation();
