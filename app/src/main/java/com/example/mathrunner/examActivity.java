@@ -21,13 +21,14 @@ public class examActivity extends AppCompatActivity {
     private Button button1, button2, button3;
     private GameInterpreter gameActivity = new GameInterpreter();
     private int lives = 3;
+    private int points = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exam);
         Intent intent = getIntent();
         lives = intent.getIntExtra("lives", 0);
-
+        points = intent.getIntExtra("points", 0);
         operationTextView = findViewById(R.id.operationTextView);
         button1 = findViewById(R.id.button1);
         button2 = findViewById(R.id.button2);
@@ -165,16 +166,19 @@ public class examActivity extends AppCompatActivity {
     private void checkAnswer(int selectedAnswer) {
         if (selectedAnswer == correctAnswer) {
             if (lives > 0) {
+                points += 100;
                 // If there are remaining lives, restart the game
                 Intent game = new Intent(this, GameActivity.class);
-                game.putExtra("lives"   , lives);
+                game.putExtra("lives", lives);
+                game.putExtra("points", points);  // Pass the updated points value
                 startActivity(game);
                 finish();
             } else {
                 // If no lives remaining, go to the end screen or perform any other logic
                 // You may want to create an EndActivity or handle game over here
                 // Example:
-                Intent endIntent = new Intent(this, Logged.class);
+                Intent endIntent = new Intent(this, EndActivity.class);
+                endIntent.putExtra("points", points);
                 startActivity(endIntent);
                 finish();
             }
@@ -183,6 +187,7 @@ public class examActivity extends AppCompatActivity {
             // If the answer is incorrect, restart the game
             Intent game = new Intent(this, GameActivity.class);
             game.putExtra("lives", lives);
+            game.putExtra("points", points);  // Pass the current points value
             startActivity(game);
             finish();
         }

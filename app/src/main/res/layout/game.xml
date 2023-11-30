@@ -56,5 +56,53 @@
         android:layout_height="wrap_content"
         android:text="Pain"/>
 
-    <include layout="@layout/lives" />
+    <include layout="@layout/lives" android:id="@+id/heart_layout_id"/>
+
+    <GridLayout
+        android:id="@+id/pointsTimerGrid"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/heart_layout_id"
+        android:layout_alignEnd="@id/heart_layout_id"
+        android:layout_marginTop="16dp"
+        android:columnCount="2"
+        android:orientation="horizontal">
+
+        <!-- Points Label and Value -->
+        <TextView
+            android:id="@+id/pointsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="@font/web_regular"
+            android:text="Points: "
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/web_regular"
+            android:textColor="#ffffff"
+            android:text="0" />
+
+        <!-- Timer Label and Value -->
+        <TextView
+            android:id="@+id/timerLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/web_regular"
+            android:text="Time: "
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/web_regular"
+            android:textColor="#ffffff"
+            android:text="0" />
+
+    </GridLayout>
 </RelativeLayout>

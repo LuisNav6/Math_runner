@@ -27,7 +27,8 @@ public class GameActivity extends AppCompatActivity {
     private Handler uiHandler; // Agregada declaración de uiHandler
     private Handler speedHandler;
     private int lives = 3;
-    private TextView life;
+    private int points = 0;
+    private TextView life, pointsTxt, timeTxt;
     private boolean isGameActive = true;
     private  ImageView Imageviewlife;
     private boolean isGameStopped = false;
@@ -38,12 +39,17 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.game);
         Intent intent = getIntent();
         lives = intent.getIntExtra("lives", 3);
+        points = intent.getIntExtra("points", 0);
         Log.d("Lives", "onCreate: lives: " + lives);
+        Log.d("Points", "points:  " + points);
         Constants.setGroundLevel(this);
         // Obtén la referencia del nuevo objeto Brain
         brain = findViewById(R.id.brain);
         book = findViewById(R.id.book);
+        pointsTxt = findViewById(R.id.points);
+        timeTxt = findViewById(R.id.timer);
         life= findViewById(R.id.life);
+        pointsTxt.setText(String.valueOf(points));
         life.setText(String.valueOf(lives));
         Imageviewlife = findViewById(R.id.heart);
 
@@ -160,21 +166,12 @@ public class GameActivity extends AppCompatActivity {
             isGameStopped = true;
             Intent intent = new Intent(this, examActivity.class);
             intent.putExtra("lives", lives);
+            intent.putExtra("points", points);
             // Start the new Activity
             startActivity(intent);
             // Finish GameActivity
             finish();
         }
-    }
-
-
-    public void restartGame() {
-        // Reset game state
-        isCollisionHandled = false;
-        // Start all animations
-        brain.initializeBrainAnimation();
-        startCloudAnimation();
-        startBookAnimation();
     }
 
     // Método para salir del juego
