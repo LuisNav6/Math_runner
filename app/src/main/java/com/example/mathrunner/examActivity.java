@@ -1,5 +1,6 @@
 package com.example.mathrunner;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -12,28 +13,29 @@ import java.util.Random;
 public class examActivity extends AppCompatActivity {
 
     private TextView operationTextView;
-    private GridLayout optionsGridLayout;
+
     private int correctAnswer;
     private int difficultyLevel;
-
+    private Button button1, button2, button3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exam);
 
         operationTextView = findViewById(R.id.operationTextView);
-        optionsGridLayout = findViewById(R.id.optionsGridLayout);
-
+        button1 = findViewById(R.id.button1);
+        button2 = findViewById(R.id.button2);
+        button3 = findViewById(R.id.button3);
         // Obtener el nivel de dificultad del intent
         difficultyLevel = getIntent().getIntExtra("DIFFICULTY_LEVEL", 0);
 
         generateRandomOperation();
-        generateOptions();
+        setButtonClickListeners();
     }
 
     private void generateRandomOperation() {
         Random random = new Random();
-        int operand1 = random.nextInt(10) + 1; // Número aleatorio entre 1 y 10
+        int operand1 = random.nextInt(10) + 1;
         int operand2 = random.nextInt(10) + 1;
 
         int operator;
@@ -69,12 +71,10 @@ public class examActivity extends AppCompatActivity {
                 result = operand1 * operand2;
                 break;
             case 3:
-                // Verificar que no haya división por cero
                 if (operand2 != 0) {
                     operatorSymbol = "/";
                     result = operand1 / operand2;
                 } else {
-                    // En caso de división por cero, generar una operación diferente
                     generateRandomOperation();
                     return;
                 }
@@ -85,48 +85,56 @@ public class examActivity extends AppCompatActivity {
 
         String operation = operand1 + " " + operatorSymbol + " " + operand2 + " = ?";
         operationTextView.setText(operation);
+
+        // Establecer valores en los botones
+        int[] options = generateOptions();
+        button1.setText(String.valueOf(options[0]));
+        button2.setText(String.valueOf(options[1]));
+        button3.setText(String.valueOf(options[2]));
     }
 
-    private void generateOptions() {
+
+    private void setButtonClickListeners() {
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkAnswer(Integer.parseInt(button1.getText().toString()));
+            }
+        });
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkAnswer(Integer.parseInt(button2.getText().toString()));
+            }
+        });
+
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkAnswer(Integer.parseInt(button3.getText().toString()));
+            }
+        });
+    }
+
+    private int[] generateOptions() {
         int[] options = new int[3];
 
-        // Generate random incorrect options
         Random random = new Random();
         for (int i = 0; i < 2; i++) {
             int incorrectOption;
             do {
-                incorrectOption = random.nextInt(20); // Random number between 0 and 19
+                incorrectOption = random.nextInt(20);
             } while (incorrectOption == correctAnswer || contains(options, incorrectOption));
 
             options[i] = incorrectOption;
         }
 
-        // Add correct answer to a random position
         int randomPosition = random.nextInt(3);
         options[randomPosition] = correctAnswer;
 
-        // Shuffle the array to randomize button positions
         shuffleArray(options);
-
-        // Add buttons dynamically
-        for (int i = 0; i < 3; i++) {
-            Button button = new Button(this);
-            button.setText(String.valueOf(options[i]));
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    checkAnswer(Integer.parseInt(((Button) view).getText().toString()));
-                }
-            });
-
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.rowSpec = GridLayout.spec(i / 2);
-            params.columnSpec = GridLayout.spec(i % 2);
-            params.setGravity(Gravity.FILL);
-            button.setLayoutParams(params);
-
-            optionsGridLayout.addView(button);
-        }
+        return options;
     }
 
     private boolean contains(int[] array, int value) {
@@ -157,7 +165,6 @@ public class examActivity extends AppCompatActivity {
 
         // Generate a new random operation and update options
         generateRandomOperation();
-        optionsGridLayout.removeAllViews();
-        generateOptions();
+
     }
 }
