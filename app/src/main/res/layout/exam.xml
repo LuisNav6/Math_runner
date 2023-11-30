@@ -15,7 +15,8 @@
         android:gravity="center"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="70sp"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white"
+        android:fontFamily="@font/race"/>
 
     <GridLayout
         android:id="@+id/optionsGridLayout"
