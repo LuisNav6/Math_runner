@@ -1,6 +1,7 @@
 package com.example.mathrunner;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,11 +33,17 @@ public class GameActivity extends AppCompatActivity {
     private boolean isGameActive = true;
     private  ImageView Imageviewlife;
     private boolean isGameStopped = false;
-    private GameInterpreter examResult = new GameInterpreter();
+    private static final String TIMER_PREFS = "TimerPrefs";
+    private static final String TIMER_KEY = "TimerKey";
+    private SharedPreferences timerPrefs;
+    private int timer;
+    private static final int END_ACTIVITY_REQUEST_CODE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
+        timerPrefs = getSharedPreferences(TIMER_PREFS, MODE_PRIVATE);
+        timer = timerPrefs.getInt(TIMER_KEY, 0);
         Intent intent = getIntent();
         lives = intent.getIntExtra("lives", 3);
         points = intent.getIntExtra("points", 0);
@@ -79,26 +86,20 @@ public class GameActivity extends AppCompatActivity {
                 break;
         }
 
-        uiHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isGameStopped) {
-                    // Actualizar la posición del cerebro
-                    brain.update();
-                    if (brain.isCollidingWithBook(book)) {
-                        handleCollision();
-                        isGameStopped = true;
-                    }
-        
-                    // Repite el bucle de juego después de un breve intervalo
-                    if (!isGameStopped) {
-                        uiHandler.postDelayed(this, 16);
-                    }
-                }
-            }
-        }, 0);
+        if(lives == 0){
+            exitGame();
+        }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Guardar el valor del temporizador en SharedPreferences
+        SharedPreferences.Editor editor = timerPrefs.edit();
+        editor.putInt(TIMER_KEY, timer);
+        editor.apply();
+    }
 
     private Handler bookAnimationHandler = new Handler();
 
@@ -164,6 +165,14 @@ public class GameActivity extends AppCompatActivity {
 
             isCollisionHandled = true;
             isGameStopped = true;
+
+            // Detener el temporizador
+            uiHandler.removeCallbacksAndMessages(null);
+            // Guardar el valor del temporizador en SharedPreferences
+            SharedPreferences.Editor editor = timerPrefs.edit();
+            editor.putInt(TIMER_KEY, timer);
+            editor.apply();
+
             Intent intent = new Intent(this, examActivity.class);
             intent.putExtra("lives", lives);
             intent.putExtra("points", points);
@@ -176,14 +185,94 @@ public class GameActivity extends AppCompatActivity {
 
     // Método para salir del juego
     private void exitGame() {
-        // Puedes agregar aquí cualquier lógica adicional antes de salir del juego
-        // Por ejemplo, mostrar un mensaje de juego terminado, guardar puntuación, etc.
         lives = 3; // Reset lives
         life.setText(String.valueOf(lives));
-        // Finaliza la actividad (sale del juego)
-        finish();
+        timeTxt.setText(String.valueOf(timer));
+        pointsTxt.setText(String.valueOf(points));
+
+        Log.d("GameActivity", "Exiting game. Timer before reset: " + timer);
+
+        int timerSend = timer;
+        timer = 0;
+        timerPrefs.edit().putInt(TIMER_KEY, timer).apply();
+        Log.d("GameActivity", "Timer after reset: " + timer);
+
+        // Update the TIMER_KEY in timerPrefs with the reset value
+        SharedPreferences.Editor editor = timerPrefs.edit();
+        editor.putInt(TIMER_KEY, timer);
+        editor.apply();
+
+        // Start EndActivity with startActivityForResult
+        Intent endIntent = new Intent(this, EndActivity.class);
+        endIntent.putExtra("timer", timerSend);
+        endIntent.putExtra("points", points);
+        startActivityForResult(endIntent, END_ACTIVITY_REQUEST_CODE);
+        points = 0;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == END_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Handle any logic you need after returning from EndActivity
+            // For example, you can finish this activity
+            finish();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isGameStopped) {
+            resumeTimer();
+        }
+    }
+
+    private void resumeTimer() {
+        uiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                timer++;
+                // Actualizar el texto del temporizador
+                timeTxt.setText(String.valueOf(timer));
+
+                // Actualizar la posición del cerebro
+                brain.update();
+                if (brain.isCollidingWithBook(book)) {
+                    handleCollision();
+                    isGameStopped = true;
+                }
+
+                // Guardar el valor del temporizador en SharedPreferences
+                SharedPreferences.Editor editor = timerPrefs.edit();
+                editor.putInt(TIMER_KEY, timer);
+                editor.apply();
+
+                // Repite el bucle de juego después de un segundo
+                if (!isGameStopped) {
+                    uiHandler.postDelayed(this, 16);
+                }
+            }
+        }, 0);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!isGameStopped) {
+            pauseTimer();
+        }
+    }
+
+    private void pauseTimer() {
+        uiHandler.removeCallbacksAndMessages(null);
+    }
+
+
+    private void resetTimer() {
+        timer = 0;
+        timeTxt.setText(String.valueOf(timer));
+    }
 
 
     @Override

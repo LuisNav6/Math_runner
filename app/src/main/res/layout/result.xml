@@ -36,30 +36,63 @@
             android:rowCount="3"
             android:background="#DDEEF9"
             android:padding="16dp"
-            android:layout_column="0"
             android:layout_gravity="center_horizontal">
 
             <!-- Título "Score" -->
-            <TextView
-                android:id="@+id/scoreTxt"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Score:"
-                android:textColor="#000000"
-                android:textSize="24sp"
-                android:layout_gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/scoreTitleTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Score:"
+                    android:layout_marginRight="10dp"
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
+
+                <!-- Texto dinámico para mostrar el valor de los puntos -->
+                <TextView
+                    android:id="@+id/scoreValueTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
+            </LinearLayout>
 
             <!-- Título "Time" -->
-            <TextView
-                android:id="@+id/timeTxt"
-                android:layout_marginTop="20dp"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
                 android:layout_height="wrap_content"
-                android:text="Time:"
-                android:textColor="#000000"
-                android:textSize="24sp"
-                android:layout_gravity="center_horizontal" />
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal">
 
+                <TextView
+                    android:id="@+id/timeTitleTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:text="Time:"
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
+
+                <!-- Texto dinámico para mostrar el valor del tiempo -->
+                <TextView
+                    android:id="@+id/timeValueTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <!-- Botón "Try Again" -->
             <android.widget.Button
                 android:id="@+id/tryAgainButton"
                 android:textColor="@color/white"
@@ -68,20 +101,16 @@
                 android:layout_height="48dp"
                 android:background="@drawable/button_background"
                 android:text="Try Again"
-                android:layout_column="0"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal|center_vertical" />
 
             <!-- Botón "Exit" -->
             <android.widget.Button
-                android:id="@+id/ExitButton"
+                android:id="@+id/exitButton"
                 android:background="@drawable/exit_style"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:textColor="@color/white"
                 android:text="Exit"
-                android:layout_column="0"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal|center_vertical" />
         </GridLayout>
     </GridLayout>

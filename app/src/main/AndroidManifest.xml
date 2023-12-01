@@ -29,6 +29,7 @@
         <activity android:name=".Settings"></activity>
         <activity android:name=".Logged"></activity>
         <activity android:name=".examActivity"></activity>
+        <activity android:name=".EndActivity"></activity>
     </application>
 
 </manifest>

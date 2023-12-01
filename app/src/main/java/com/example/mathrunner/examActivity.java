@@ -19,7 +19,6 @@ public class examActivity extends AppCompatActivity {
     private int correctAnswer;
     private int difficultyLevel;
     private Button button1, button2, button3;
-    private GameInterpreter gameActivity = new GameInterpreter();
     private int lives = 3;
     private int points = 0;
     @Override
@@ -177,7 +176,7 @@ public class examActivity extends AppCompatActivity {
                 // If no lives remaining, go to the end screen or perform any other logic
                 // You may want to create an EndActivity or handle game over here
                 // Example:
-                Intent endIntent = new Intent(this, EndActivity.class);
+                Intent endIntent = new Intent(this, GameActivity.class);
                 endIntent.putExtra("points", points);
                 startActivity(endIntent);
                 finish();
