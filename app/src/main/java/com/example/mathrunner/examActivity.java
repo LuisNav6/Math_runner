@@ -1,6 +1,7 @@
 package com.example.mathrunner;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -166,6 +167,8 @@ public class examActivity extends AppCompatActivity {
         if (selectedAnswer == correctAnswer) {
             if (lives > 0) {
                 points += 100;
+                MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.points);
+                mediaPlayer.start();
                 // If there are remaining lives, restart the game
                 Intent game = new Intent(this, GameActivity.class);
                 game.putExtra("lives", lives);
@@ -183,6 +186,8 @@ public class examActivity extends AppCompatActivity {
             }
         } else {
             --lives;
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.lose);
+            mediaPlayer.start();
             // If the answer is incorrect, restart the game
             Intent game = new Intent(this, GameActivity.class);
             game.putExtra("lives", lives);

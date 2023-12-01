@@ -3,6 +3,7 @@ package com.example.mathrunner;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -158,6 +159,9 @@ public class GameActivity extends AppCompatActivity {
     private void handleCollision() {
         if (!isCollisionHandled) {
             Log.d("Collision", "Brain collided with Book!");
+            
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.hit);
+            mediaPlayer.start();
             // Stop all animations
             brain.stopAnimation();
             stopBookAnimation();
