@@ -2,17 +2,18 @@ package com.example.mathrunner;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 public class LoginSignUp extends AppCompatActivity {
-
+private String username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_sign_up);
-
+        username = getIntent().getStringExtra("USERNAME");
         // Encuentra los botones por su ID
         Button loginButton = findViewById(R.id.loginButton);
         Button signUpButton = findViewById(R.id.signUpButton);
@@ -43,6 +44,7 @@ public class LoginSignUp extends AppCompatActivity {
             public void onClick(View v) {
                 // Redirige a la actividad de registros (reemplaza RecordsActivity.class con tu actividad real)
                 Intent intent = new Intent(LoginSignUp.this, Records.class);
+                intent.putExtra("USERNAME", username);
                 startActivity(intent);
             }
         });

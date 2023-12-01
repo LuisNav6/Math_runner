@@ -30,6 +30,8 @@ public class GameActivity extends AppCompatActivity {
     private Handler speedHandler;
     private int lives = 3;
     private int points = 0;
+    private String username = "";
+
     private TextView life, pointsTxt, timeTxt;
     private boolean isGameActive = true;
     private  ImageView Imageviewlife;
@@ -39,6 +41,7 @@ public class GameActivity extends AppCompatActivity {
     private SharedPreferences timerPrefs;
     private int timer;
     private static final int END_ACTIVITY_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +51,10 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         lives = intent.getIntExtra("lives", 3);
         points = intent.getIntExtra("points", 0);
+        username = intent.getStringExtra("USERNAME");
         Log.d("Lives", "onCreate: lives: " + lives);
         Log.d("Points", "points:  " + points);
+        Log.d("user","username: "+ username);
         Constants.setGroundLevel(this);
         // Obtén la referencia del nuevo objeto Brain
         brain = findViewById(R.id.brain);
@@ -180,6 +185,8 @@ public class GameActivity extends AppCompatActivity {
             Intent intent = new Intent(this, examActivity.class);
             intent.putExtra("lives", lives);
             intent.putExtra("points", points);
+            intent.putExtra("USERNAME", username);
+
             // Start the new Activity
             startActivity(intent);
             // Finish GameActivity
@@ -210,6 +217,7 @@ public class GameActivity extends AppCompatActivity {
         Intent endIntent = new Intent(this, EndActivity.class);
         endIntent.putExtra("timer", timerSend);
         endIntent.putExtra("points", points);
+        endIntent.putExtra("USERNAME", username);
         startActivityForResult(endIntent, END_ACTIVITY_REQUEST_CODE);
         points = 0;
     }

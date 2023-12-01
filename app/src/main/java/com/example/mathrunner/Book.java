@@ -32,9 +32,18 @@ public class Book extends AppCompatImageView {
     }
 
     private void init() {
-        // Configura la imagen (book)
-        int drawableResourceId = getResources().getIdentifier("book", "drawable", getContext().getPackageName());
+        // Configura la imagen (book) y escala la imagen
+        int drawableResourceId = getResources().getIdentifier("books", "drawable", getContext().getPackageName());
         Drawable bookDrawable = getResources().getDrawable(drawableResourceId);
+
+        // Ajusta la escala de la imagen (puedes cambiar estos valores según tus necesidades)
+        float scale = 4.0f;  // Ajusta el factor de escala deseado
+        int scaledWidth = (int) (bookDrawable.getIntrinsicWidth() * scale);
+        int scaledHeight = (int) (bookDrawable.getIntrinsicHeight() * scale);
+
+        // Escala la imagen
+        bookDrawable.setBounds(0, 0, scaledWidth, scaledHeight);
+
         setImageDrawable(bookDrawable);
     }
 

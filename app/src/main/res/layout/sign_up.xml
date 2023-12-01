@@ -16,7 +16,7 @@
         android:layout_marginRight="25dp"
         android:layout_marginBottom="60dp"
         android:columnCount="1"
-        android:rowCount="5"
+        android:rowCount="6"
         android:alignmentMode="alignBounds"
         android:rowOrderPreserved="false">
 
@@ -29,11 +29,23 @@
             android:layout_column="0" />
 
         <EditText
-            android:id="@+id/NewUsernameEditText"
+            android:id="@+id/usernameEditText"
             android:layout_width="200dp"
             android:background="@drawable/edit_text_background"
             android:layout_height="48dp"
             android:hint="New Nick Name"
+            android:padding="10dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            style="@style/editTextStyle"
+            android:layout_column="0"
+            android:layout_gravity="center_horizontal|center_vertical" />
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="200dp"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="48dp"
+            android:hint="New password"
             android:padding="10dp"
             android:layout_marginTop="20dp"
             android:gravity="center"

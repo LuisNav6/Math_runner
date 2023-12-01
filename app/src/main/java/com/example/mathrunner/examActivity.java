@@ -2,13 +2,10 @@ package com.example.mathrunner;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Random;
@@ -16,12 +13,11 @@ import java.util.Random;
 public class examActivity extends AppCompatActivity {
 
     private TextView operationTextView;
-
     private int correctAnswer;
-    private int difficultyLevel;
     private Button button1, button2, button3;
     private int lives = 3;
     private int points = 0;
+    private String username = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,12 +25,11 @@ public class examActivity extends AppCompatActivity {
         Intent intent = getIntent();
         lives = intent.getIntExtra("lives", 0);
         points = intent.getIntExtra("points", 0);
+        username = intent.getStringExtra("USERNAME");
         operationTextView = findViewById(R.id.operationTextView);
         button1 = findViewById(R.id.button1);
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
-        // Obtener el nivel de dificultad del intent
-        difficultyLevel = getIntent().getIntExtra("DIFFICULTY_LEVEL", 0);
 
         generateRandomOperation();
         setButtonClickListeners();
@@ -42,27 +37,12 @@ public class examActivity extends AppCompatActivity {
 
     private void generateRandomOperation() {
         Random random = new Random();
-        int operand1 = random.nextInt(10) + 1;
-        int operand2 = random.nextInt(10) + 1;
+        int operand1 = random.nextInt(100) + 1;
+        int operand2 = random.nextInt(100) + 1;
 
-        int operator;
+        int operator = random.nextInt(4); // Suma, resta, multiplicación o división
         String operatorSymbol = "";
         int result = 0;
-
-        switch (difficultyLevel) {
-            case 0: // Fácil
-                operator = random.nextInt(2); // Suma o resta
-                break;
-            case 1: // Medio
-                operator = random.nextInt(3); // Suma, resta o multiplicación
-                break;
-            case 2: // Difícil
-                operator = random.nextInt(4); // Suma, resta, multiplicación o división
-                break;
-            default:
-                operator = random.nextInt(4);
-                break;
-        }
 
         switch (operator) {
             case 0:
@@ -82,7 +62,7 @@ public class examActivity extends AppCompatActivity {
                     operatorSymbol = "/";
                     result = operand1 / operand2;
                 } else {
-                    generateRandomOperation();
+                    generateRandomOperation(); // Retry if division by zero
                     return;
                 }
                 break;
@@ -99,7 +79,6 @@ public class examActivity extends AppCompatActivity {
         button2.setText(String.valueOf(options[1]));
         button3.setText(String.valueOf(options[2]));
     }
-
 
     private void setButtonClickListeners() {
         button1.setOnClickListener(new View.OnClickListener() {
@@ -169,18 +148,21 @@ public class examActivity extends AppCompatActivity {
                 points += 100;
                 MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.points);
                 mediaPlayer.start();
-                // If there are remaining lives, restart the game
+
+                // Si quedan vidas, reinicia el juego
                 Intent game = new Intent(this, GameActivity.class);
                 game.putExtra("lives", lives);
-                game.putExtra("points", points);  // Pass the updated points value
+                game.putExtra("points", points);
+                game.putExtra("USERNAME",username);// Pasa el valor actualizado de puntos
                 startActivity(game);
                 finish();
             } else {
-                // If no lives remaining, go to the end screen or perform any other logic
-                // You may want to create an EndActivity or handle game over here
-                // Example:
+                // Si no quedan vidas, ve a la pantalla de fin de juego o realiza cualquier otra lógica
+                // Puedes crear una EndActivity o manejar el juego terminado aquí
+                // Ejemplo:
                 Intent endIntent = new Intent(this, GameActivity.class);
                 endIntent.putExtra("points", points);
+                endIntent.putExtra("USERNAME",username);
                 startActivity(endIntent);
                 finish();
             }
@@ -188,15 +170,22 @@ public class examActivity extends AppCompatActivity {
             --lives;
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.lose);
             mediaPlayer.start();
-            // If the answer is incorrect, restart the game
+
+            // Si la respuesta es incorrecta, reinicia el juego
             Intent game = new Intent(this, GameActivity.class);
             game.putExtra("lives", lives);
-            game.putExtra("points", points);  // Pass the current points value
+            game.putExtra("points", points);
+            game.putExtra("USERNAME",username);// Pasa el valor actual de puntos
             startActivity(game);
             finish();
         }
 
-        // Generate a new random operation and update options
-        generateRandomOperation();
+        // Genera una nueva operación aleatoria y actualiza las opciones con un retraso de 3 segundos
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                generateRandomOperation();
+            }
+        }, 3000); // Retraso de 3 segundos
     }
 }
