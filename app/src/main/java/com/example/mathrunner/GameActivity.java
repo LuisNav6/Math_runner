@@ -172,6 +172,9 @@ public class GameActivity extends AppCompatActivity {
             stopBookAnimation();
             stopCloudAnimation();
 
+            // Reset the book's speed
+            Constants.BOOK_SPEED = Constants.INITIAL_BOOK_SPEED;
+
             isCollisionHandled = true;
             isGameStopped = true;
 

@@ -19,13 +19,28 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Inicializa el MediaPlayer aquí
         mediaPlayer = MediaPlayer.create(this, R.raw.background_music);
-
-        // Verifica si el MediaPlayer se inicializó correctamente
         if (mediaPlayer != null) {
-            // Configura el MediaPlayer para que se reproduzca en bucle
             mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    public boolean isPlaying() {
+        if (mediaPlayer != null) {
+            return mediaPlayer.isPlaying();
+        }
+        return false;
+    }
+
+    public void setVolume(float volume) {
+        if (mediaPlayer != null) {
+            mediaPlayer.setVolume(volume, volume);
         }
     }
 
@@ -42,25 +57,15 @@ public class MusicService extends Service {
 
     public void stopMusic() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
+            mediaPlayer.stop();
         }
-    }
-
-    public void setVolume(float volume) {
-        if (mediaPlayer != null) {
-            mediaPlayer.setVolume(volume, volume);
-        }
-    }
-    public boolean isPlaying() {
-        return mediaPlayer != null && mediaPlayer.isPlaying();
     }
 
     @Override
     public void onDestroy() {
-        // Detén y libera el MediaPlayer cuando se destruya el servicio
         if (mediaPlayer != null) {
-            mediaPlayer.stop();
             mediaPlayer.release();
+            mediaPlayer = null;
         }
         super.onDestroy();
     }

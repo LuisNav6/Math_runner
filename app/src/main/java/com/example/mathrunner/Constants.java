@@ -11,6 +11,7 @@ public class Constants {
     public static float BOOK_SPEED = 150;
     public static final int JUMP_HEIGHT = 1000;
     public static final int JUMP_DURATION = 1000;
+    public static float INITIAL_BOOK_SPEED = 150;
 
     // Other constants
     public static final int INITIAL_BRAIN_X = 0; // Initial X position of the brain
