@@ -30,6 +30,7 @@
         <activity android:name=".Logged"></activity>
         <activity android:name=".examActivity"></activity>
         <activity android:name=".EndActivity"></activity>
+        <service android:name=".MusicService"></service>
     </application>
 
 </manifest>

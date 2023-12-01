@@ -25,13 +25,6 @@ public class LoginSignUp extends AppCompatActivity {
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         startService(new Intent(this, MusicService.class));
 
-        // Asegúrate de que musicService no sea nulo antes de llamar a startMusic()
-        if (musicService == null) {
-            musicService = new MusicService();
-            musicService.startMusic();
-        }else{
-            Log.d("Null", "onCreate: musicService is null");
-        }
 
         username = getIntent().getStringExtra("USERNAME");
         // Encuentra los botones por su ID

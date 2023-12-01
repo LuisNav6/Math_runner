@@ -61,8 +61,6 @@ public class Settings extends AppCompatActivity implements SensorEventListener{
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 // Redirigir a LoginSignUp y enviar el grado de dificultad como parámetro
                 Intent loginIntent = new Intent(Settings.this, LoginSignUp.class);
                 startActivity(loginIntent);
@@ -71,6 +69,7 @@ public class Settings extends AppCompatActivity implements SensorEventListener{
                 finish();
             }
         });
+
 
         // Inicializa el detector de agitación
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -90,35 +89,53 @@ public class Settings extends AppCompatActivity implements SensorEventListener{
         }
     }
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            long currentTime = System.currentTimeMillis();
-            if ((currentTime - lastUpdate) > 100) {
-                long timeDiff = currentTime - lastUpdate;
-                lastUpdate = currentTime;
+public void onSensorChanged(SensorEvent event) {
+    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        long currentTime = System.currentTimeMillis();
+        if ((currentTime - lastUpdate) > 100) {
+            long timeDiff = currentTime - lastUpdate;
+            lastUpdate = currentTime;
 
-                float x = event.values[0];
-                float y = event.values[1];
-                float z = event.values[2];
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
 
-                float speed = Math.abs(x + y + z - lastX - lastY - lastZ) / timeDiff * 10000;
+            float speed = Math.abs(x + y + z - lastX - lastY - lastZ) / timeDiff * 10000;
 
-                // Ajusta el umbral según sea necesario
-                if (speed > 800) {
-                    // Agitar detectada, apagar/encender la música
-                    if (musicService != null) {
-                        if (musicService.isPlaying()) {
-                            musicService.stopMusic();
-                        } else {
-                            musicService.startMusic();
-                        }
+            // Ajusta el umbral según sea necesario
+            if (speed > 800) {
+                // Shake detected, toggle mute
+                if (musicService != null) {
+                    if (musicService.isMuted()) {
+                        // If music is muted, unmute and set volume to previous level
+                        musicService.muteMusic();
+                        volumeSeekBar.setProgress((int) (musicService.getVolume() * 100));
+                    } else {
+                        // If music is playing, mute and set volume to 0
+                        musicService.muteMusic();
+                        volumeSeekBar.setProgress(0);
                     }
                 }
-
-                lastX = x;
-                lastY = y;
-                lastZ = z;
             }
+
+            lastX = x;
+            lastY = y;
+            lastZ = z;
+        }
+    }
+}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (isBound) {
+
+            // Update the SeekBar progress
+            SharedPreferences preferences = getSharedPreferences("MusicService", MODE_PRIVATE);
+            float volume = preferences.getFloat("volume", 1.0f);
+            volumeSeekBar.setProgress((int) (volume * 100));
+
         }
     }
 
@@ -128,7 +145,11 @@ public class Settings extends AppCompatActivity implements SensorEventListener{
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
             musicService = binder.getService();
             isBound = true;
-            musicService.startMusic();
+            // Update the SeekBar progress
+            SharedPreferences preferences = getSharedPreferences("MusicService", MODE_PRIVATE);
+            float volume = preferences.getFloat("volume", 1.0f);
+            volumeSeekBar.setProgress((int) (volume * 100));
+
         }
 
         @Override
