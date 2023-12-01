@@ -23,7 +23,7 @@ private String username;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.result);
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.win);
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.victory);
         mediaPlayer.start();
         Intent intent = getIntent();
         timer = intent.getIntExtra("timer", 0);

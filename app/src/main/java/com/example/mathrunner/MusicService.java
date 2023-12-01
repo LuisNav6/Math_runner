@@ -51,6 +51,9 @@ public class MusicService extends Service {
             mediaPlayer.setVolume(volume, volume);
         }
     }
+    public boolean isPlaying() {
+        return mediaPlayer != null && mediaPlayer.isPlaying();
+    }
 
     @Override
     public void onDestroy() {
